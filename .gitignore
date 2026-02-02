@@ -1,23 +1,16 @@
-# --- 核心大文件（绝对不能传） ---
+# data, checkpoints and logs
+data/
 checkpoints/
 LOGS/
 results/
-data/
-datasets/
-data.zip
-Rebuttal/
-
-
-scripts_comp/
-dinov2/
-coin/
-
-# --- 临时和调试文件 ---
 samples/
-visualize/
-masks/
-mask_full.png
+data.zip
+
+# others
+dinov2/
 examples/
+Rebuttal/
+scripts_comp/
 
 # --- Python 编译与环境 ---
 __pycache__/
@@ -31,7 +24,3 @@ env/
 # --- 操作系统冗余 ---
 .DS_Store
 Thumbs.db
-
-# --- 其它可能包含隐私或权重的文件夹 ---
-ldm/models/
-dinov2/weights/

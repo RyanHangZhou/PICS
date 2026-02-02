@@ -16,72 +16,37 @@ from ldm.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSeq
 from ldm.models.diffusion.ddpm import LatentDiffusion
 from ldm.util import log_txt_as_img, exists, instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
-import numpy as np
 
+def scale_mask(m, target_h):
+    m_resized = F.interpolate(m.permute(0, 3, 1, 2).float(), size=target_h, mode='nearest')
+    return m_resized.permute(0, 2, 3, 1).unsqueeze(1)
 
 class ControlledUnetModel(UNetModel):
     def forward(self, x, timesteps=None, context=None, control=None, only_mid_control=False, c_mask=None, **kwargs):
         hs = []
+
         with torch.no_grad():
             t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
             emb = self.time_embed(t_emb)
             h = x.type(self.dtype)
-            c_mask_ = c_mask.permute(0, 3, 1, 2)
-            num_channels = c_mask_.size(1)
-            c_mask_ = F.interpolate(c_mask_.float(), size=(h.shape[2], h.shape[3]), mode='nearest')
-            c_mask_ = c_mask_.permute(0, 2, 3, 1)
-            c_mask_ = c_mask_.unsqueeze(1)
+
             for module in self.input_blocks:
-                h = module(h, emb, context, c_mask_)
+                m_emb = scale_mask(c_mask, h.shape[2:4])
+                h = module(h, emb, context, m_emb)
                 hs.append(h)
-                c_mask_ = c_mask.permute(0, 3, 1, 2)
-                num_channels = c_mask_.size(1)
-                c_mask_ = F.interpolate(c_mask_.float(), size=(h.shape[2], h.shape[3]), mode='nearest')
-                c_mask_ = c_mask_.permute(0, 2, 3, 1)
-                c_mask_ = c_mask_.unsqueeze(1)
-            h = self.middle_block(h, emb, context, c_mask_)
+
+            m_emb = scale_mask(c_mask, h.shape[2:4])
+            h = self.middle_block(h, emb, context, m_emb)
 
         if control is not None:
             h += control.pop()
 
         for i, module in enumerate(self.output_blocks):
-            if only_mid_control or control is None:
-                h = torch.cat([h, hs.pop()], dim=1)
-            else:
-                h = torch.cat([h, hs.pop() + control.pop()], dim=1)
-            c_mask_ = c_mask.permute(0, 3, 1, 2)
-            num_channels = c_mask_.size(1)
-            c_mask_ = F.interpolate(c_mask_.float(), size=(h.shape[2], h.shape[3]), mode='nearest')
-            c_mask_ = c_mask_.permute(0, 2, 3, 1)
-            c_mask_ = c_mask_.unsqueeze(1)
-            h = module(h, emb, context, c_mask_)
+            h = torch.cat([h, hs.pop() + (control.pop() if (control and not only_mid_control) else 0)], dim=1)
+            m_emb = scale_mask(c_mask, h.shape[2:4])
+            h = module(h, emb, context, m_emb)
 
-        h = h.type(x.dtype)
-        return self.out(h)
-
-    # def forward(self, x, timesteps=None, context=None, control=None, only_mid_control=False, **kwargs):
-    #     hs = []
-    #     with torch.no_grad():
-    #         t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
-    #         emb = self.time_embed(t_emb)
-    #         h = x.type(self.dtype)
-    #         for module in self.input_blocks:
-    #             h = module(h, emb, context)
-    #             hs.append(h)
-    #         h = self.middle_block(h, emb, context)
-
-    #     if control is not None:
-    #         h += control.pop()
-
-    #     for i, module in enumerate(self.output_blocks):
-    #         if only_mid_control or control is None:
-    #             h = torch.cat([h, hs.pop()], dim=1)
-    #         else:
-    #             h = torch.cat([h, hs.pop() + control.pop()], dim=1)
-    #         h = module(h, emb, context)
-
-    #     h = h.type(x.dtype)
-    #     return self.out(h)
+        return self.out(h.type(x.dtype))
 
 
 class ControlNet(nn.Module):
@@ -323,39 +288,10 @@ class ControlNet(nn.Module):
 
     def forward(self, x, hint, timesteps, context, c_mask, **kwargs):
         t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
-        emb = self.time_embed(t_emb) # 1,1280
-        
-        # import pdb; pdb.set_trace()
-        # 1,320,64,64
-        # print('hint shape: ', np.shape(hint)) # [1, 4, 512, 512]
-        # print('hint max and min: ', torch.max(hint), torch.min(hint))
-        # 1, -1
-        # print('context shape: ', np.shape(context)) # [1, 257, 1024, 2]
-        # print('c_mask shape: ', np.shape(c_mask)) # [1, 512, 512, 2]
-        
-        # print('use_spatial_transformer:', self.use_spatial_transformer) # True
-        # import pdb; pdb.set_trace()
-        # context = context.permute(0, 2, 3, 1)
-        # print('after context shape: ', np.shape(context)) # [1, 257, 1024, 2]
-        # import pdb; pdb.set_trace()
+        emb = self.time_embed(t_emb)
 
-        # resize masks
-        # print('before c_mask shape: ', np.shape(c_mask)) # [1, 512, 512, 2]
-        c_mask_ = c_mask.permute(0, 3, 1, 2)
-        # c_mask_ = F.interpolate(c_mask_, size=(x.shape[2], x.shape[3]), mode='nearest')
-        num_channels = c_mask_.size(1)
-        # kernel = torch.ones((num_channels, 1, 1, 1))
-        # c_mask_ = F.conv2d(c_mask_.float(), kernel, groups=num_channels, padding=2) > 0  # 膨胀后再二值化
-        c_mask_ = F.interpolate(c_mask_.float(), size=(x.shape[2], x.shape[3]), mode='nearest')
-        c_mask_ = c_mask_.permute(0, 2, 3, 1)
-        # print('mask shape: ', np.shape(c_mask)) # [1, 64, 64, 2]
-        # print('context shape: ', np.shape(context)) # [1, 257, 1024, 2]
-        c_mask_ = c_mask_.unsqueeze(1)
-        # print('c_mask shape: ', np.shape(c_mask)) # [1, 1, 64, 64, 2]
-        # import pdb; pdb.set_trace()
-
-        guided_hint = self.input_hint_block(hint, emb, context, c_mask_) # only encode hint
-        # print('guided_hint shape: ', np.shape(guided_hint)) # [1, 320, 64, 64]
+        m_emb = scale_mask(c_mask, x.shape[2:4])
+        guided_hint = self.input_hint_block(hint, emb, context, m_emb) # only encode hint
 
         outs = []
 
@@ -364,77 +300,18 @@ class ControlNet(nn.Module):
             if guided_hint is not None:
                 # skip the first layer
                 h = guided_hint
-                # print('h shape: ', np.shape(h))
-                # print('c_mask_ shape: ', np.shape(c_mask_))
-                # import pdb; pdb.set_trace()
-                # print('module: ', module)
-                # print('111111111111111')
                 guided_hint = None
             else:
-                # print('222222222222222')
-                c_mask_ = c_mask.permute(0, 3, 1, 2)
-                num_channels = c_mask_.size(1)
-                c_mask_ = F.interpolate(c_mask_.float(), size=(h.shape[2], h.shape[3]), mode='nearest')
-                c_mask_ = c_mask_.permute(0, 2, 3, 1)
-                c_mask_ = c_mask_.unsqueeze(1)
-                h_new = module(h, emb, context, c_mask_)
+                m_emb = scale_mask(c_mask, h.shape[2:4])
+                h_new = module(h, emb, context, m_emb)
                 h =  h_new
-                # print('h_new shape: ', np.shape(h_new))
-            outs.append(zero_conv(h, emb, context, c_mask_))
-            # print('3333333333333333')
+            outs.append(zero_conv(h, emb, context, m_emb))
 
-        # print('end 2')
-        # import pdb; pdb.set_trace()
-        # print('44444444444444444')
-        c_mask_ = c_mask.permute(0, 3, 1, 2)
-        num_channels = c_mask_.size(1)
-        c_mask_ = F.interpolate(c_mask_.float(), size=(h.shape[2], h.shape[3]), mode='nearest')
-        c_mask_ = c_mask_.permute(0, 2, 3, 1)
-        c_mask_ = c_mask_.unsqueeze(1)
-        h_new = self.middle_block(h, emb, context, c_mask_)
-        c_mask_ = c_mask.permute(0, 3, 1, 2)
-        num_channels = c_mask_.size(1)
-        c_mask_ = F.interpolate(c_mask_.float(), size=(h_new.shape[2], h_new.shape[3]), mode='nearest')
-        c_mask_ = c_mask_.permute(0, 2, 3, 1)
-        c_mask_ = c_mask_.unsqueeze(1)
-        outs.append(self.middle_block_out(h_new, emb, context, c_mask_))
+        m_emb = scale_mask(c_mask, h.shape[2:4])
+        h_new = self.middle_block(h, emb, context, m_emb)
+        m_emb = scale_mask(c_mask, h.shape[2:4])
+        outs.append(self.middle_block_out(h_new, emb, context, m_emb))
         return outs
-
-    # def forward(self, x, hint, timesteps, context, c_mask, **kwargs):
-    #     t_emb = timestep_embedding(timesteps, self.model_channels, repeat_only=False)
-    #     emb = self.time_embed(t_emb) # 1,1280
-        
-    #     # 1,320,64,64
-    #     # print('hint shape: ', np.shape(hint)) # [1, 4, 512, 512]
-    #     # print('context shape: ', np.shape(context)) # [1, 257, 1024] -> [1, 2, 257, 1024]
-    #     # print('use_spatial_transformer:', self.use_spatial_transformer) # True
-    #     # import pdb; pdb.set_trace()
-    #     # context = context.permute(0, 2, 3, 1)
-    #     # print('after context shape: ', np.shape(context)) # [1, 257, 1024, 2]
-    #     # import pdb; pdb.set_trace()
-    #     guided_hint = self.input_hint_block(hint, emb, context) # only encode hint
-    #     # print('guided_hint shape: ', np.shape(guided_hint)) # [1, 320, 64, 64]
-    #     # print('end 1')
-    #     # import pdb; pdb.set_trace()
-    #     outs = []
-
-    #     h = x.type(self.dtype)
-    #     for module, zero_conv in zip(self.input_blocks, self.zero_convs):
-    #         if guided_hint is not None:
-    #             # skip the first layer
-    #             h = guided_hint
-    #             guided_hint = None
-    #         else:
-    #             h_new = module(h, emb, context) 
-    #             h =  h_new 
-    #         outs.append(zero_conv(h, emb, context))
-
-    #     # print('end 2')
-    #     # import pdb; pdb.set_trace()
-
-    #     h_new = self.middle_block(h, emb, context)  
-    #     outs.append(self.middle_block_out(h_new, emb, context))        
-    #     return outs
 
 
 class ControlLDM(LatentDiffusion):
@@ -472,21 +349,15 @@ class ControlLDM(LatentDiffusion):
         assert isinstance(cond, dict)
         diffusion_model = self.model.diffusion_model
 
-        cond_txt = cond['c_crossattn'][0]['pch_code'] # [N, 257, 1024, 2]
-        hint = torch.cat(cond['c_concat'], 1) # [N, 4, 512, 512]
+        cond_txt = cond['c_crossattn'][0]['pch_code']
+        hint = torch.cat(cond['c_concat'], 1)
         c_mask = torch.cat(cond['c_mask'], 1)
-        # print('c_mask shape: ', np.shape(c_mask)) # [1, 1, 224, 224, 2]
         c_mask = c_mask.squeeze(1)
-        # import pdb; pdb.set_trace()
-        # print(np.shape(c_mask)) # [1, 224, 224, 2] -> [2, 512, 512, 2] (batch=2)
-        # import pdb; pdb.set_trace()
 
         if cond['c_concat'] is None:
             eps = diffusion_model(x=x_noisy, timesteps=t, context=cond_txt, control=None, only_mid_control=self.only_mid_control)
-        else: # check
-            # import pdb; pdb.set_trace()
-            # print('x_noisy shape: ', np.shape(x_noisy), 'c_concat shape: ', np.shape(torch.cat(cond['c_concat'], 1)))
-            control = self.control_model(x=x_noisy, hint=torch.cat(cond['c_concat'], 1), timesteps=t, context=cond_txt, c_mask=c_mask)
+        else:
+            control = self.control_model(x=x_noisy, hint=hint, timesteps=t, context=cond_txt, c_mask=c_mask)
             control = [c * scale for c, scale in zip(control, self.control_scales)]
             eps = diffusion_model(x=x_noisy, timesteps=t, context=cond_txt, control=control, only_mid_control=self.only_mid_control, c_mask=c_mask)
         return eps
@@ -517,18 +388,9 @@ class ControlLDM(LatentDiffusion):
         log = dict()
         z, c = self.get_input(batch, self.first_stage_key, bs=N)
         
-        # import pdb; pdb.set_trace()
-        # print(np.shape(["c_concat"][0]), np.shape(c["c_crossattn"][0]), np.shape(c["c_mask"][0]))
-        # print(["c_concat"][0])
-        # print(c["c_crossattn"][0])
-        # import pdb; pdb.set_trace()
-        
         c_cat, c, c_mask = c["c_concat"][0][:N], c["c_crossattn"][0], c["c_mask"][0][:N]
         c = {k: v[:4] for k, v in c.items()}
         N = min(z.shape[0], N)
-        # print(np.shape(c_cat), np.shape(c), np.shape(c_mask))
-        # print('N: ', N)
-        # import pdb; pdb.set_trace()
         
         n_row = min(z.shape[0], n_row)
         log["reconstruction"] = self.decode_first_stage(z) 

@@ -205,8 +205,17 @@ python run_train.py \
 
 
 
+####################
+# Submission
 
 
+CUDA_VISIBLE_DEVICES=2 python run_train.py \
+    --resume_path 'LOGS/LVIS_two_obj/lightning_logs/version_9/checkpoints/epoch=1-step=68319.ckpt' \
+    --root_dir 'LOGS/LVIS_two_obj' \
+    --batch_size 1 \
+    --limit_train_batches 1 \
+    --logger_freq 1000 \
+    --dataset_name lvis
 
 
 

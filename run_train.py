@@ -14,6 +14,7 @@ from torch.utils.data import ConcatDataset
 from cldm.hack import disable_verbosity, enable_sliced_attention
 from omegaconf import OmegaConf
 import torch
+from pytorch_lightning.plugins import DDPPlugin
 
 print("Number of GPUs available: ", torch.cuda.device_count())
 print("Current device: ", torch.cuda.current_device())
@@ -49,30 +50,6 @@ def main(args):
     
     checkpoint = load_state_dict(args.resume_path, location='cpu')
     model.load_state_dict(checkpoint, strict=False)
-
-
-    # --- load & prune cond_stage weights from old ckpt (e.g., DINOv2-G/14) ---
-    # ckpt = load_state_dict(args.resume_path, location='cpu')
-
-    # # 有的 ckpt 外面包了一层 'state_dict'，统一展开
-    # state = ckpt.get('state_dict', ckpt)
-
-    # # 去掉 DDP 前缀（如 'module.'）
-    # state = {k.replace('module.', ''): v for k, v in state.items()}
-
-    # # 丢弃旧的 cond stage 参数，避免 1536↔1280 维度冲突
-    # DROP_PREFIX = ('cond_stage_model.',)
-    # pruned = {k: v for k, v in state.items() if not k.startswith(DROP_PREFIX)}
-
-    # missing, unexpected = model.load_state_dict(pruned, strict=False)
-    # print(f"[load] kept={len(pruned)} dropped={len(state)-len(pruned)} | "
-    #       f"missing={len(missing)} unexpected={len(unexpected)}")
-
-    # # 可选：看看丢了哪些 key（只打印前 10 个）
-    # dropped = [k for k in state.keys() if k.startswith(DROP_PREFIX)]
-    # print("[load] dropped keys (sample):", dropped[:10])
-
-
 
     model.learning_rate = args.learning_rate
     model.sd_locked = sd_locked
@@ -115,7 +92,7 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser('COIN Training', parents=[get_args_parser()])
+    parser = argparse.ArgumentParser('PICS Training', parents=[get_args_parser()])
     args = parser.parse_args()
     main(args)
 

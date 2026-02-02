@@ -8,7 +8,6 @@ model:
     timesteps: 1000
     first_stage_key: "jpg"
     cond_stage_key: "ref"
-    # cond_stage_key: "view"
     control_key: "hint"
     image_size: 64
     channels: 4
@@ -84,8 +83,4 @@ model:
       target: ldm.modules.encoders.modules.FrozenDinoV2Encoder
       weight: checkpoints/dinov2_vitg14_pretrain.pth
 
-    # cond_stage_config:
-    #   target: ldm.modules.encoders.modules.FrozenDinoV3Encoder
-    #   weight: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/checkpoints/dinov3_vith16plus_pretrain.pth
-    
 
