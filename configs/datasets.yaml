@@ -1,0 +1,30 @@
+Defaults:
+  area_ratio: 0.01171
+  obj_thr: 2
+
+Train:
+  LVIS:
+    construct_dataset_dir: 'data/train/LVIS'
+
+  VITONHD:
+    construct_dataset_dir: '/data/train/VITONHD'
+
+  Objects365:
+    construct_dataset_dir: 'data/train/Objects365'
+
+  Cityscapes:
+    construct_dataset_dir: 'data/train/Cityscapes'
+
+  MapillaryVistas:
+    construct_dataset_dir: 'data/train/MapillaryVistas'
+
+  BDD100K:
+    construct_dataset_dir: 'data/train/BDD100K'
+
+Test:
+  DreamBooth:
+    fg_dir: path/DreamBooth/AnyDoor_DreamBooth
+    bg_dir: path/DreamBooth/v1_800
+
+  VitonHDTest:
+    image_dir: path/TryOn/VitonHD/test/cloth

@@ -1,0 +1,18 @@
+# pretrained_model: lightning_logs/version_30/checkpoints/epoch=0-step=34160.ckpt
+# pretrained_model: checkpoints/epoch=7-step=182127.ckpt
+# pretrained_model: lightning_logs/version_38/checkpoints/epoch=0-step=123588.ckpt ## best
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/lvis/lightning_logs/version_1/checkpoints/epoch=5-step=51240.ckpt
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/lvis_attn/lightning_logs/version_0/checkpoints/epoch=2-step=25620.ckpt
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/lvis_attn_weight/lightning_logs/version_5/checkpoints/epoch=1-step=34158.ckpt
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/lvis_attn_weight/lightning_logs/version_9/checkpoints/epoch=13-step=69202.ckpt
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/lvis_attn_weight/lightning_logs/version_17/checkpoints/epoch=2-step=71928.ckpt
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/lvis_attn_weight/lightning_logs/version_18/checkpoints/epoch=2-step=71928.ckpt
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/lvis_attn_weight/lightning_logs/version_21/checkpoints/epoch=1-step=47952.ckpt
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/lvis_attn_weight/lightning_logs/version_33/checkpoints/epoch=0-step=23976.ckpt # masked training
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/all_attn_weight/lightning_logs/version_4/checkpoints/epoch=0-step=74153.ckpt
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/lvis_attn_weight_dinov3/lightning_logs/version_0/checkpoints/epoch=2-step=51237.ckpt
+# pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/vitonhd_attn_weight/lightning_logs/version_3/checkpoints/epoch=1-step=11642.ckpt
+# pretrained_model: /data/hang/customization/PICS/LOGS/LVS_two_obj/lightning_logs/version_9/checkpoints/epoch=0-step=34159.ckpt # masked training
+pretrained_model: /data/hang/customization/PICS/LOGS/LVIS_two_obj/lightning_logs/version_9/checkpoints/epoch=1-step=68319.ckpt # masked training
+config_file: configs/grabcompose.yaml
+save_memory: False

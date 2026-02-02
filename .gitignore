@@ -1,0 +1,37 @@
+# --- 核心大文件（绝对不能传） ---
+checkpoints/
+LOGS/
+results/
+data/
+datasets/
+data.zip
+Rebuttal/
+
+
+scripts_comp/
+dinov2/
+coin/
+
+# --- 临时和调试文件 ---
+samples/
+visualize/
+masks/
+mask_full.png
+examples/
+
+# --- Python 编译与环境 ---
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+# 虽然你有 environment.yaml，但建议忽略本地虚拟环境文件夹（如果有的话）
+venv/
+.venv/
+env/
+
+# --- 操作系统冗余 ---
+.DS_Store
+Thumbs.db
+
+# --- 其它可能包含隐私或权重的文件夹 ---
+ldm/models/
+dinov2/weights/
