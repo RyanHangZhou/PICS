@@ -1,5 +1,5 @@
 <h1 align="center">PICS: Pairwise Image Compositing with Spatial Interactions</h1>
-<p align="center"><img src="assets/figure.pdf" width="80%"></p>
+<p align="center"><img src="assets/figure.jpg" width="80%"></p>
 
 <span style="font-size: 16px; font-weight: 600;">Despite strong single-turn performance, diffusion-based image compositing often struggles to preserve coherent spatial relations in pairwise or sequential edits, where subsequent insertions may overwrite previously generated content and disrupt physical consistency. 
 We introduce \emph{PICS}, a self-supervised \hang{composition-by-decomposition} paradigm that composes objects \emph{in parallel} while explicitly modeling the \emph{compositional interactions} among (fully-/partially-)visible objects and background.
