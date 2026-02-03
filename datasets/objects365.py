@@ -167,7 +167,6 @@ if __name__ == "__main__":
     two-object case: train/test: TODO/51791
     '''
     import argparse
-    import pprint
 
     parser = argparse.ArgumentParser(description="Objects365Dataset Analysis")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the dataset directory.")

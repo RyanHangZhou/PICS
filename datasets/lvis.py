@@ -123,7 +123,7 @@ class LVISDataset(BaseDataset):
 
         anno = annos[idx]
 
-        # ---------- 1) 按面积过滤 ----------
+        # filter by area
         obj_ids = []
         obj_areas = []
         obj_bbox = []
@@ -139,7 +139,7 @@ class LVISDataset(BaseDataset):
             print(f"[Info] Skip image index {image_name[:-4]} due to insufficient bbox (need >=3, got {len(obj_bbox)}).")
             return
 
-        # ---------- 2) 计算 IOU 矩阵 ----------
+        # calculate IOU matrix
         bbox_xyxy = []
         for box in obj_bbox:
             x, y, w_box, h_box = box
@@ -154,14 +154,12 @@ class LVISDataset(BaseDataset):
         iou_matrix = compute_iou_matrix(bbox_xyxy)
         np.fill_diagonal(iou_matrix, -1)  # Exclude self-comparisons
 
-        # ---------- 3) 选出 3 个互相有重叠的物体 ----------
-        # 先算每个 bbox 与其他 bbox 的 IOU 和，选一个“中心”框
+        # find 3 overlapped objects
         positive_iou = np.where(iou_matrix > 0, iou_matrix, 0.0)
         row_sums = positive_iou.sum(axis=1)
         anchor = int(np.argmax(row_sums))
 
-        # 在 anchor 这一行中，按 IOU 大小排序，选出 IOU>0 的两个最佳伙伴
-        partner_candidates = np.argsort(iou_matrix[anchor])[::-1]  # 从大到小
+        partner_candidates = np.argsort(iou_matrix[anchor])[::-1]
         partners = [int(p) for p in partner_candidates if iou_matrix[anchor, p] > 0]
 
         if len(partners) < 2:
@@ -172,19 +170,18 @@ class LVISDataset(BaseDataset):
         index1 = partners[0]
         index2 = partners[1]
 
-        # 如果你想要一个“整体的最大 IOU”的指标可以打印一下
         max_iou_pair = max(iou_matrix[index0, index1], iou_matrix[index0, index2], iou_matrix[index1, index2])
         if max_iou_pair <= 0:
             print(f"[Info] Skip image index {image_name[:-4]} due to no overlapping bboxes.")
             return
 
-        # ---------- 4) 拷贝原图 ----------
+        # copy original image
         out_dir = Path(self.construct_dataset_dir) / image_name[:-4]
         out_dir.mkdir(parents=True, exist_ok=True)
         dst = out_dir / "image.jpg"
         shutil.copy(image_path, dst)
 
-        # ---------- 5) 导出第 0 个物体 ----------
+        # first object
         anno_id = anno[obj_ids[index0]]
         mask0 = lvis_api.ann_to_mask(anno_id)
         cv2.imwrite(str(out_dir / "object_0_mask.png"), 255 * mask0)
@@ -193,7 +190,6 @@ class LVISDataset(BaseDataset):
         cv2.imwrite(str(out_dir / "object_0.png"), patch0)
 
         if IS_VERIFY:
-            # 红色高亮第 0 个物体
             mask_color = np.stack([mask0 * 255] * 3, axis=-1).astype(np.uint8)
             highlight = np.zeros_like(image)
             highlight[:, :, 2] = 255  # red channel
@@ -204,7 +200,7 @@ class LVISDataset(BaseDataset):
                 image_with_boxes
             )
 
-        # ---------- 6) 导出第 1 个物体 ----------
+        # second object
         anno_id = anno[obj_ids[index1]]
         mask1 = lvis_api.ann_to_mask(anno_id)
         cv2.imwrite(str(out_dir / "object_1_mask.png"), 255 * mask1)
@@ -213,7 +209,6 @@ class LVISDataset(BaseDataset):
         cv2.imwrite(str(out_dir / "object_1.png"), patch1)
 
         if IS_VERIFY:
-            # 蓝色高亮第 1 个物体
             mask_color = np.stack([mask1 * 255] * 3, axis=-1).astype(np.uint8)
             highlight = np.zeros_like(image)
             highlight[:, :, 0] = 255  # blue channel
@@ -224,7 +219,7 @@ class LVISDataset(BaseDataset):
                 image_with_boxes
             )
 
-        # ---------- 7) 导出第 2 个物体 ----------
+        # third object
         anno_id = anno[obj_ids[index2]]
         mask2 = lvis_api.ann_to_mask(anno_id)
         cv2.imwrite(str(out_dir / "object_2_mask.png"), 255 * mask2)
@@ -233,7 +228,6 @@ class LVISDataset(BaseDataset):
         cv2.imwrite(str(out_dir / "object_2.png"), patch2)
 
         if IS_VERIFY:
-            # 绿色高亮第 2 个物体
             mask_color = np.stack([mask2 * 255] * 3, axis=-1).astype(np.uint8)
             highlight = np.zeros_like(image)
             highlight[:, :, 1] = 255  # green channel
@@ -265,7 +259,6 @@ if __name__ == "__main__":
     two-object case: train/test: 34610/8859
     '''
     import argparse
-    import pprint
 
     parser = argparse.ArgumentParser(description="LVISDataset Analysis")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the dataset directory.")
@@ -305,8 +298,8 @@ if __name__ == "__main__":
     if args.is_build_data: 
         if not args.is_multiple:
             for index in range(max_num):
-                # dataset._intersect_2_obj(image_dirs, lvis_api, imgs_info, annos, index)
-                dataset._intersect_3_obj(image_dirs, lvis_api, imgs_info, annos, index)
+                dataset._intersect_2_obj(image_dirs, lvis_api, imgs_info, annos, index)
+                # dataset._intersect_3_obj(image_dirs, lvis_api, imgs_info, annos, index)
     else:
         for index in range(len(os.listdir(args.construct_dataset_dir))):
             collage = dataset._get_sample(index)

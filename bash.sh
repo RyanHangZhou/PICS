@@ -217,7 +217,5 @@ CUDA_VISIBLE_DEVICES=2 python run_train.py \
     --logger_freq 1000 \
     --dataset_name lvis
 
-
-
-
+####### data construction
 

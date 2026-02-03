@@ -177,7 +177,6 @@ if __name__ == "__main__":
     two-object case: train/test: 603/190
     '''
     import argparse
-    import pprint
 
     parser = argparse.ArgumentParser(description="MapillaryVistasDataset Analysis")
     parser.add_argument("--dataset_dir", type=str, required=True, help="Path to the dataset directory.")

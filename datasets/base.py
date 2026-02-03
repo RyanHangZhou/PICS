@@ -1,19 +1,11 @@
-import json
-import cv2
 import numpy as np
-import os
-from torch.utils.data import Dataset
-from PIL import Image
 import cv2
-from .data_utils import * 
-cv2.setNumThreads(0)
-cv2.ocl.setUseOpenCL(False)
 import albumentations as A
-
+from torch.utils.data import Dataset
+from .data_utils import * 
 
 class BaseDataset(Dataset):
     def __init__(self):
-        image_mask_dict = {}
         self.data = []
 
     def __getitem__(self, idx):
@@ -28,23 +20,8 @@ class BaseDataset(Dataset):
         # We adjust the ratio of different dataset by setting the length.
         pass
 
-    def check_region_size(self, image, yyxx, ratio, mode = 'max'):
-        pass_flag = True
-        H,W = image.shape[0], image.shape[1]
-        H,W = H * ratio, W * ratio
-        y1,y2,x1,x2 = yyxx
-        h,w = y2-y1,x2-x1
-        if mode == 'max':
-            if h > H or w > W:
-                pass_flag = False
-        elif mode == 'min':
-            if h < H or w < W:
-                pass_flag = False
-        return pass_flag
-
     def aug_data_mask(self, image, mask):
         transform = A.Compose([
-            # A.HorizontalFlip(p=0.5),
             A.RandomBrightnessContrast(p=0.5),
             A.Rotate(limit=90, border_mode=cv2.BORDER_CONSTANT),
             ])
@@ -61,53 +38,49 @@ class BaseDataset(Dataset):
             A.Rotate(limit=30, border_mode=cv2.BORDER_REPLICATE),
             ])
 
-        transformed = transform(image=patch)
-        transformed_patch = transformed["image"]
-        return transformed_patch
+        return transform(image=patch)["image"]
 
-    def sample_timestep(self, max_step = 1000):
+    def sample_timestep(self, max_step=1000):
         if np.random.rand() < 0.3:
-            step = np.random.randint(0,max_step)
-            return np.array([step])
-        step_start = 0
-        step_end = max_step
-        step = np.random.randint(step_start, step_end)
+            step = np.random.randint(0, max_step)
+        else:
+            step = np.random.randint(0, max_step // 2)
         return np.array([step])
 
     def get_patch(self, ref_image, ref_mask):
         '''
+        extract compact patch and convert to 224x224 RGBA. 
         ref_mask: [0, 1]
         '''
 
         # 1. Get the outline Box of the reference image
-        ref_box_yyxx = get_bbox_from_mask(ref_mask) # y1y2x1x2, obtain location from ref patch
-        # assert self.check_region_size(ref_mask, ref_box_yyxx, ratio = 0.10, mode = 'min') == True
+        y1, y2, x1, x2 = get_bbox_from_mask(ref_mask) # y1y2x1x2, obtain location from ref patch
         
-        # 2. Filtering background for the reference image
-        ref_mask_3 = np.stack([ref_mask,ref_mask,ref_mask],-1)
-        masked_ref_image = ref_image * ref_mask_3 + np.ones_like(ref_image) * 255 * (1-ref_mask_3) # obtain patch (outside white) [0, 255]
+        # 2. Background is set to white (255)
+        ref_mask_3 = np.stack([ref_mask, ref_mask, ref_mask], -1)
+        masked_ref_image = ref_image * ref_mask_3 + np.ones_like(ref_image) * 255 * (1 - ref_mask_3)
 
         # 3. Crop based on bounding boxes
-        y1,y2,x1,x2 = ref_box_yyxx
-        masked_ref_image = masked_ref_image[y1:y2,x1:x2,:]
-        ref_mask = ref_mask[y1:y2,x1:x2] # obtain a tight mask
+        masked_ref_image = masked_ref_image[y1:y2, x1:x2, :]
+        ref_mask_crop = ref_mask[y1:y2, x1:x2] # obtain a tight mask
 
         # 4. Dilate the patch and mask
-        # ratio = 1 # np.random.randint(11, 15) / 10 
         ratio = np.random.randint(11, 15) / 10
-        masked_ref_image, ref_mask = expand_image_mask(masked_ref_image, ref_mask, ratio=ratio)
+        masked_ref_image, ref_mask_crop = expand_image_mask(masked_ref_image, ref_mask_crop, ratio=ratio)
 
         # augmentation
-        # masked_ref_image, ref_mask = self.aug_data_mask(masked_ref_image, ref_mask) 
+        # masked_ref_image, ref_mask_crop = self.aug_data_mask(masked_ref_image, ref_mask_crop) 
 
-        # 5. Padding reference image to square and resize to 224
-        masked_ref_image = pad_to_square(masked_ref_image, pad_value = 255, random = False) # pad to square
-        masked_ref_image = cv2.resize(masked_ref_image.astype(np.uint8), (224,224) ).astype(np.uint8) # check 1
+        # 5. Padding & Resize 
+        masked_ref_image = pad_to_square(masked_ref_image, pad_value=255)
+        masked_ref_image = cv2.resize(masked_ref_image.astype(np.uint8), (224, 224))
 
-        ref_mask_3 = pad_to_square(ref_mask_3 * 255, pad_value = 0, random = False)
-        ref_mask_3 = cv2.resize(ref_mask_3.astype(np.uint8), (224,224) ).astype(np.uint8)
+        m_local = ref_mask_crop[:, :, None] * 255
+        m_local = pad_to_square(m_local, pad_value=0)
+        m_local = cv2.resize(m_local.astype(np.uint8), (224, 224), interpolation=cv2.INTER_NEAREST)
+        
+        rgba_image = np.dstack((masked_ref_image.astype(np.uint8), m_local))
 
-        rgba_image = np.dstack((masked_ref_image, ref_mask_3[:, :, 0]))
         return rgba_image
 
     def _construct_collage(self, image, object_0, object_1, mask_0, mask_1):
@@ -175,10 +148,10 @@ class BaseDataset(Dataset):
 
         background = background / 127.5 - 1.0 
         background = np.concatenate([background, background_mask[:,:,:1]] , -1)
-        item.update({'hint': background.copy()}) # condition image (temporal) [-1, 1], 512x512x4
+        item.update({'hint': background.copy()})
 
-        item.update({'mask0': background_mask0_.copy()}) # mask (checked) [0, 1], 512x512
-        item.update({'mask1': background_mask1_.copy()}) # mask (checked) [0, 1], 512x512
+        item.update({'mask0': background_mask0_.copy()})
+        item.update({'mask1': background_mask1_.copy()})
 
         sampled_time_steps = self.sample_timestep()
         item['time_steps'] = sampled_time_steps
