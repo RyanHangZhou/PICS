@@ -1,18 +1,6 @@
 <h1 align="center">PICS: Pairwise Image Compositing with Spatial Interactions</h1>
 <p align="center"><img src="assets/figure.jpg" width="100%"></p>
 
-<span style="font-size: 16px; font-weight: 600;">Despite strong single-turn performance, diffusion-based image compositing often struggles to preserve coherent spatial relations in pairwise or sequential edits, where subsequent insertions may overwrite previously generated content and disrupt physical consistency. 
-We introduce \emph{PICS}, a self-supervised \hang{composition-by-decomposition} paradigm that composes objects \emph{in parallel} while explicitly modeling the \emph{compositional interactions} among (fully-/partially-)visible objects and background.
-At its core, an Interaction Transformer employs mask-guided Mixture-of-Experts to route background, exclusive, and overlap regions to dedicated experts, 
-with an \emph{adaptive} $\alpha$-blending strategy that infers a compatibility-aware fusion of overlapping objects while preserving boundary fidelity.
-To further enhance robustness to geometric variations, we incorporate geometry-aware augmentations covering both out-of-plane and in-plane pose changes of objects. 
-Our method delivers superior pairwise compositing quality and substantially improved stability, with extensive evaluations across virtual try-on, indoor, and street scene settings showing consistent gains over state-of-the-art baselines.. </span>
-
-
-<!-- # BOOTPLACE
-PyTorch implementation for paper BOOTPLACE: Bootstrapped Object Placement with Detection Transformers. -->
-
-
 <!-- ***Check out our [Project Page](https://ryanhangzhou.github.io/bootplace/) for more visual demos!*** -->
 
 <!-- Updates -->
