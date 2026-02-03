@@ -2,19 +2,14 @@ import json
 import cv2
 import numpy as np
 import os
-from torch.utils.data import Dataset
-from PIL import Image
-import cv2
 from .data_utils import * 
 from .base import BaseDataset
 from pycocotools import mask as mask_utils
-# from lvis import LVIS
-from pycocotools.coco import COCO
 from pathlib import Path
 from util.box_ops import compute_iou_matrix, draw_bboxes
 import shutil
 
-IS_VERIFY = True
+IS_VERIFY = False
 IS_BOX = False
 
 def save_bboxes(bbox_xyxy, save_path="bboxes.txt"):

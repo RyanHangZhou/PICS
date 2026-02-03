@@ -1,8 +1,6 @@
-import json
 import cv2
 import numpy as np
 import os
-from PIL import Image
 from .data_utils import * 
 from .base import BaseDataset
 from lvis import LVIS

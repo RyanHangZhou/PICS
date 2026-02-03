@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import os
 from PIL import Image
-import cv2
 from .data_utils import * 
 from .base import BaseDataset
 from pathlib import Path
@@ -72,26 +71,11 @@ class VITONHDDataset(BaseDataset):
         iou_matrix = compute_iou_matrix(bbox_xyxy)
         np.fill_diagonal(iou_matrix, -1) # Exclude self-comparisons (i.e., each box with itself)
 
-        # max_index = np.unravel_index(np.argmax(iou_matrix), iou_matrix.shape)
-        # index0, index1 = max_index[0], max_index[1]
-        # max_iou = iou_matrix[index0, index1]
-
-        # 按面积从大到小排序
         sorted_obj_ids = np.argsort(obj_areas)[::-1]
         assert len(sorted_obj_ids) > 0
 
-        # 用面积最大的对象的索引作为 index0
         index0 = sorted_obj_ids[0]
-
-        # 在 iou_matrix 中找到该对象对应的最佳匹配 index1
         index1 = sorted_obj_ids[1]
-
-        # 得到对应的最大 iou
-        # max_iou = iou_matrix[index0, index1]
-
-        # if max_iou <= 0:
-        #     print(f"[Info] Skip image index {image_name[:-4]} due to no overlapping bboxes.")
-        #     return
 
         os.makedirs(Path(self.construct_dataset_dir) / image_name[:-4], exist_ok=True)
         dst = Path(self.construct_dataset_dir) / image_name[:-4] / "image.jpg"

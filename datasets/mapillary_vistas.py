@@ -2,11 +2,9 @@ import json
 import cv2
 import numpy as np
 import os
-from torch.utils.data import Dataset
 from PIL import Image
 from .data_utils import * 
 from .base import BaseDataset
-from scipy.ndimage import label
 from util.box_ops import mask_to_bbox_xywh, compute_iou_matrix, draw_bboxes
 from pathlib import Path
 import shutil

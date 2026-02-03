@@ -4,8 +4,6 @@ import einops
 import numpy as np
 import torch
 import random
-import sys
-from pytorch_lightning import seed_everything
 from cldm.model import create_model, load_state_dict
 from cldm.ddim_hacked import DDIMSampler
 from cldm.hack import disable_verbosity, enable_sliced_attention
@@ -14,9 +12,6 @@ cv2.setNumThreads(0)
 cv2.ocl.setUseOpenCL(False)
 import albumentations as A
 from omegaconf import OmegaConf
-from PIL import Image
-from pycocotools.coco import COCO
-from lvis import LVIS
 
 
 save_memory = False
