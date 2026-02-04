@@ -76,7 +76,6 @@ def main(input_root, output_dir, N, M):
 if __name__ == "__main__":
     
     import argparse
-    import pprint
 
     parser = argparse.ArgumentParser(description="Visualize data")
     parser.add_argument("--input_root", type=str, required=True, help="Path to the constructed dataset.")

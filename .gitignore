@@ -11,6 +11,7 @@ dinov2/
 examples/
 Rebuttal/
 scripts_comp/
+visualize/
 
 # --- Python 编译与环境 ---
 __pycache__/

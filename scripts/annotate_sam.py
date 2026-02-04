@@ -7,7 +7,6 @@ from segment_anything import sam_model_registry, SamPredictor
 from lvis import LVIS
 import copy
 from pathlib import Path
-# import time
 
 
 class Objects365SAM():
@@ -99,9 +98,6 @@ class Objects365SAM():
             torch.cuda.empty_cache()
             counter += 1
             print('Done image idex: ', counter)
-            # end_time = time.time()
-            # total_time = end_time - start_time
-            # print(f"[Timer] Avg per image: {total_time:.2f} sec, or {total_time/60:.2f} min.")
 
 def save_annotations_to_json(image_id, mask_annotations, output_file):
     coco_format_output = {
@@ -118,7 +114,6 @@ if __name__ == "__main__":
     Image number: train/test: 1742292/80000
     '''
     import argparse
-    import pprint
 
     parser = argparse.ArgumentParser(description="Annotate labels with Segment Anything")
     parser.add_argument('--is_train', action='store_true', help="Train/Test")
