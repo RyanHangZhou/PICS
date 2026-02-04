@@ -22,9 +22,5 @@ Train:
     construct_dataset_dir: 'data/train/BDD100K'
 
 Test:
-  DreamBooth:
-    fg_dir: path/DreamBooth/AnyDoor_DreamBooth
-    bg_dir: path/DreamBooth/v1_800
-
-  VitonHDTest:
-    image_dir: path/TryOn/VitonHD/test/cloth
+  LVIS:
+    construct_dataset_dir: 'data/test/LVIS'

@@ -6,7 +6,6 @@ import torchvision
 from PIL import Image
 from pytorch_lightning.callbacks import Callback
 from pytorch_lightning.utilities import rank_zero_only
-# import pytorch_lightning.utilities.rank_zero
 
 
 class ImageLogger(Callback):
@@ -53,9 +52,6 @@ class ImageLogger(Callback):
                 pl_module.eval()
 
             with torch.no_grad():
-                # obj_thr = self.log_images_kwargs.get('obj_thr', 1)
-                # print('obj_thr: ', obj_thr)
-                # import pdb; pdb.set_trace()
                 images = pl_module.log_images(batch, split=split, **self.log_images_kwargs)
 
             for k in images:

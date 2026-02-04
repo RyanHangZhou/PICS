@@ -36,7 +36,7 @@ n_gpus = 1
 accumulate_grad_batches = 1
 obj_thr = {'obj_thr': 2}
 
-model = create_model('./configs/grabcompose.yaml').cpu()
+model = create_model('./configs/pics.yaml').cpu()
 checkpoint = load_state_dict(resume_path, location='cpu')
 
 model.load_state_dict(checkpoint, strict=False)

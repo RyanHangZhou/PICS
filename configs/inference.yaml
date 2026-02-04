@@ -14,5 +14,5 @@
 # pretrained_model: /home/hang18/links/projects/rrg-vislearn/hang18/COIN/LOGS/vitonhd_attn_weight/lightning_logs/version_3/checkpoints/epoch=1-step=11642.ckpt
 # pretrained_model: /data/hang/customization/PICS/LOGS/LVS_two_obj/lightning_logs/version_9/checkpoints/epoch=0-step=34159.ckpt # masked training
 pretrained_model: /data/hang/customization/PICS/LOGS/LVIS_two_obj/lightning_logs/version_9/checkpoints/epoch=1-step=68319.ckpt # masked training
-config_file: configs/grabcompose.yaml
+config_file: configs/pics.yaml
 save_memory: False

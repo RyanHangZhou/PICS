@@ -1,4 +1,0 @@
-pretrained_model: checkpoints/epoch=1-step=8687.ckpt
-config_file: configs/grabcompose.yaml
-save_memory: False
-use_interactive_seg: True

@@ -14,7 +14,7 @@ from torchvision.utils import make_grid
 from ldm.modules.attention import SpatialTransformer
 from ldm.modules.diffusionmodules.openaimodel import UNetModel, TimestepEmbedSequential, ResBlock, Downsample, AttentionBlock
 from ldm.models.diffusion.ddpm import LatentDiffusion
-from ldm.util import log_txt_as_img, exists, instantiate_from_config
+from ldm.util import exists, instantiate_from_config
 from ldm.models.diffusion.ddim import DDIMSampler
 
 def scale_mask(m, target_h):
@@ -364,18 +364,10 @@ class ControlLDM(LatentDiffusion):
 
     @torch.no_grad()
     def get_unconditional_conditioning(self, N, obj_thr):
-        # uncond = self.get_learned_conditioning([ torch.zeros((1, 3, 224, 224)) ] * N)
-        x = [ torch.zeros((1, 3, 224, 224)) ] * N
-        uc = []
-        for i in range(obj_thr):
-            uc_i = self.get_learned_conditioning(x)
-            uc.append(uc_i)
-        uc = torch.stack(uc)
-        uc = uc.permute(1, 2, 3, 0)
+        x = [torch.zeros((1, 3, 224, 224)).to(self.device)] * N
+        single_uc = self.get_learned_conditioning(x)
+        uc = single_uc.unsqueeze(-1).repeat(1, 1, 1, obj_thr) 
         return uc
-    # def get_unconditional_conditioning(self, N, obj_thr):
-    #     uncond = self.get_learned_conditioning([ torch.zeros((1, 3, 224, 224)) ] * N)
-    #     return uncond
 
     @torch.no_grad()
     def log_images(self, batch, N=4, n_row=2, sample=False, ddim_steps=50, ddim_eta=0.0, return_keys=None,
@@ -395,15 +387,16 @@ class ControlLDM(LatentDiffusion):
         n_row = min(z.shape[0], n_row)
         log["reconstruction"] = self.decode_first_stage(z) 
 
-        # ==== visualize the shape mask or the high-frequency map ====
-        guide_mask = (c_cat[:,-1,:,:].unsqueeze(1) + 1) * 0.5
-        guide_mask = torch.cat([guide_mask,guide_mask,guide_mask],1)
-        HF_map  = c_cat[:,:3,:,:] #* 2.0 - 1.0
+        guide_mask = (c_cat[:, -1, :, :].unsqueeze(1) + 1) * 0.5
+        guide_mask = torch.cat([guide_mask, guide_mask, guide_mask], 1)
+        log["control"] = c_cat[:,:3,:,:]
 
-        log["control"] = HF_map
+        cond_image0 = batch[self.cond_stage_key+'0'].cpu().numpy().copy()
+        cond_image1 = batch[self.cond_stage_key+'1'].cpu().numpy().copy()
+        t0 = torch.permute(torch.tensor(cond_image0), (0,3,1,2)) * 2.0 - 1.0
+        t1 = torch.permute(torch.tensor(cond_image1), (0,3,1,2)) * 2.0 - 1.0
+        log["conditioning"] = torch.cat([t0, t1], dim=0)
 
-        cond_image = batch[self.cond_stage_key+'0'].cpu().numpy().copy() ####### need adjustment
-        log["conditioning"] = torch.permute( torch.tensor(cond_image), (0,3,1,2)) * 2.0 - 1.0  
         if plot_diffusion_rows:
             # get diffusion row
             diffusion_row = list()
@@ -422,9 +415,8 @@ class ControlLDM(LatentDiffusion):
             diffusion_grid = make_grid(diffusion_grid, nrow=diffusion_row.shape[0])
             log["diffusion_row"] = diffusion_grid
 
-        if sample: # not go into
+        if sample:
             # get denoise row
-            import pdb; pdb.set_trace()
             samples, z_denoise_row = self.sample_log(cond={"c_concat": [c_cat], "c_crossattn": [c], "c_mask": [c_mask]},
                                                      batch_size=N, ddim=use_ddim,
                                                      ddim_steps=ddim_steps, eta=ddim_eta)
@@ -434,10 +426,8 @@ class ControlLDM(LatentDiffusion):
                 denoise_grid = self._get_denoise_row_from_list(z_denoise_row)
                 log["denoise_row"] = denoise_grid
 
-        if unconditional_guidance_scale > 1.0: # checked
+        if unconditional_guidance_scale > 1.0:
             obj_thr = kwargs.get('obj_thr', 1)
-            # print('obj_thr: ', obj_thr)
-            # import pdb; pdb.set_trace()
             uc_cross = self.get_unconditional_conditioning(N, obj_thr)
             uc_cat = c_cat  # torch.zeros_like(c_cat)
             uc_full = {"c_concat": [uc_cat], "c_crossattn": [uc_cross], "c_mask": [c_mask]}
@@ -448,7 +438,7 @@ class ControlLDM(LatentDiffusion):
                                              unconditional_conditioning=uc_full,
                                              )
             x_samples_cfg = self.decode_first_stage(samples_cfg)
-            log[f"samples_cfg_scale_{unconditional_guidance_scale:.2f}"] = x_samples_cfg #* 2.0 - 1.0
+            log[f"samples_cfg_scale_{unconditional_guidance_scale:.2f}"] = x_samples_cfg
         return log
 
     @torch.no_grad()

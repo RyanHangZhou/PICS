@@ -21,7 +21,7 @@ print("Current device: ", torch.cuda.current_device())
 print("Device name: ", torch.cuda.get_device_name(0))
 
 def get_args_parser():
-    parser = argparse.ArgumentParser('COIN Training Script', add_help=False)
+    parser = argparse.ArgumentParser('PICS Training Script', add_help=False)
 
     parser.add_argument('--resume_path', required=True, type=str)
     parser.add_argument('--root_dir', required=True, type=str)
@@ -45,7 +45,7 @@ def main(args):
     accumulate_grad_batches = 1
     obj_thr = {'obj_thr': 2}
 
-    model = create_model('./configs/grabcompose.yaml').cpu()
+    model = create_model('./configs/pics.yaml').cpu()
 
     
     checkpoint = load_state_dict(args.resume_path, location='cpu')
@@ -86,7 +86,6 @@ def main(args):
 
     dataloader = DataLoader(dataset, num_workers=8, batch_size=args.batch_size, shuffle=True)
     logger = ImageLogger(batch_frequency=args.logger_freq, log_images_kwargs=obj_thr)
-    # trainer = pl.Trainer(default_root_dir=args.root_dir, limit_train_batches=args.limit_train_batches, strategy="ddp", precision=16, accelerator="auto", callbacks=[logger], accumulate_grad_batches=accumulate_grad_batches, max_epochs=50)
     trainer = pl.Trainer(default_root_dir=args.root_dir, limit_train_batches=args.limit_train_batches, gpus=1, precision=16, accelerator="auto", callbacks=[logger], accumulate_grad_batches=accumulate_grad_batches, max_epochs=50)
     trainer.fit(model, dataloader)
 

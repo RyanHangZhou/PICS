@@ -78,17 +78,12 @@ class TimestepEmbedSequential(nn.Sequential, TimestepBlock):
 
     def forward(self, x, emb, context=None, c_mask=None):
         for layer in self:
-            # print(layer)
-            # print(type(layer))
             if isinstance(layer, TimestepBlock):
                 x = layer(x, emb)
-                # print('1')
             elif isinstance(layer, SpatialTransformer):
                 x = layer(x, context, c_mask)
-                # print('2')
             else:
                 x = layer(x)
-                # print('3')
         return x
 
 
@@ -274,8 +269,6 @@ class ResBlock(TimestepBlock):
             h = out_norm(h) * (1 + scale) + shift
             h = out_rest(h)
         else:
-            # print(np.shape(h), np.shape(emb_out))
-            # import pdb; pdb.set_trace()
             h = h + emb_out
             h = self.out_layers(h)
         return self.skip_connection(x) + h
