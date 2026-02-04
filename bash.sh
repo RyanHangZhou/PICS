@@ -214,7 +214,7 @@ CUDA_VISIBLE_DEVICES=2 python run_train.py \
     --root_dir 'LOGS/LVIS_two_obj' \
     --batch_size 1 \
     --limit_train_batches 1 \
-    --logger_freq 1000 \
+    --logger_freq 10 \
     --dataset_name lvis
 
 ####### data construction

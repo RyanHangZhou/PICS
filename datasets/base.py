@@ -23,7 +23,7 @@ class BaseDataset(Dataset):
     def aug_data_mask(self, image, mask):
         transform = A.Compose([
             A.RandomBrightnessContrast(p=0.5),
-            A.Rotate(limit=90, border_mode=cv2.BORDER_CONSTANT),
+            A.Rotate(limit=30, border_mode=cv2.BORDER_CONSTANT),
             ])
 
         transformed = transform(image=image.astype(np.uint8), mask=mask)
@@ -31,14 +31,31 @@ class BaseDataset(Dataset):
         transformed_mask = transformed["mask"]
         return transformed_image, transformed_mask
 
-    def aug_patch(self, patch):
-        transform = A.Compose([
-            A.HorizontalFlip(p=0.5),
-            A.RandomBrightnessContrast(p=0.5),
-            A.Rotate(limit=30, border_mode=cv2.BORDER_REPLICATE),
-            ])
+    # def aug_patch(self, patch):
+    #     transform = A.Compose([
+    #         A.HorizontalFlip(p=0.2),
+    #         A.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, p=0.3),
+    #         A.Rotate(limit=15, border_mode=cv2.BORDER_REPLICATE, p=0.5),
+    #         ])
 
-        return transform(image=patch)["image"]
+    #     return transform(image=patch)["image"]
+
+    def aug_patch(self, patch):
+        gray = cv2.cvtColor(patch, cv2.COLOR_RGB2GRAY)
+        mask = (gray < 250).astype(np.float32)[:, :, None] 
+
+        transform = A.Compose([
+            A.HorizontalFlip(p=0.2),
+            A.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, p=0.3),
+            A.Rotate(limit=15, border_mode=cv2.BORDER_REPLICATE, p=0.5),
+        ])
+
+        transformed = transform(image=patch.astype(np.uint8), mask=mask)
+        aug_img = transformed["image"]
+        aug_mask = transformed["mask"]
+        final_img = aug_img * aug_mask + 255 * (1 - aug_mask)
+
+        return final_img.astype(np.uint8)
 
     def sample_timestep(self, max_step=1000):
         if np.random.rand() < 0.3:
@@ -96,7 +113,7 @@ class BaseDataset(Dataset):
         object_0 = self.aug_patch(object_0)
         object_0 = pad_to_square(object_0, pad_value = 255, random = False) # pad to square
         object_0 = cv2.resize(object_0.astype(np.uint8), (224,224) ).astype(np.uint8) # check 1
-        object_0 = object_0  / 255 
+        object_0 = object_0 / 255 
         item.update({'ref0': object_0.copy()}) # patch 0 (checked) [0, 1], 224x224x3
 
         ratio = np.random.randint(11, 15) / 10 
@@ -104,7 +121,7 @@ class BaseDataset(Dataset):
         object_1 = self.aug_patch(object_1)
         object_1 = pad_to_square(object_1, pad_value = 255, random = False) # pad to square
         object_1 = cv2.resize(object_1.astype(np.uint8), (224,224) ).astype(np.uint8) # check 1
-        object_1 = object_1  / 255 
+        object_1 = object_1 / 255 
         item.update({'ref1': object_1.copy()}) # patch 1 (checked) [0, 1], 224x224x3
 
         background_mask0 = background.copy() * 0.0

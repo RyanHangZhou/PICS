@@ -1,5 +1,4 @@
 import numpy as np
-import torch 
 import cv2
 
 def resize_and_pad(image, box):
@@ -98,4 +97,36 @@ def box2squre(image, box):
     x2 = min(W,x2)
     y1 = max(0,y1)
     y2 = min(H,y2)
+    return (y1,y2,x1,x2)
+
+
+def pad_to_square(image, pad_value = 255, random = False):
+    H,W = image.shape[0], image.shape[1]
+    if H == W:
+        return image
+
+    padd = abs(H - W)
+    if random:
+        padd_1 = int(np.random.randint(0,padd))
+    else:
+        padd_1 = int(padd / 2)
+    padd_2 = padd - padd_1
+
+    if H > W:
+        pad_param = ((0,0),(padd_1,padd_2),(0,0))
+    else:
+        pad_param = ((padd_1,padd_2),(0,0),(0,0))
+
+    image = np.pad(image, pad_param, 'constant', constant_values=pad_value)
+    return image
+
+def get_bbox_from_mask(mask):
+    h,w = mask.shape[0],mask.shape[1]
+
+    if mask.sum() < 10:
+        return 0,h,0,w
+    rows = np.any(mask,axis=1)
+    cols = np.any(mask,axis=0)
+    y1,y2 = np.where(rows)[0][[0,-1]]
+    x1,x2 = np.where(cols)[0][[0,-1]]
     return (y1,y2,x1,x2)

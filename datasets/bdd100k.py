@@ -2,15 +2,9 @@ import json
 import cv2
 import numpy as np
 import os
-from torch.utils.data import Dataset
-from PIL import Image
 from .data_utils import * 
 from .base import BaseDataset
-from lvis import LVIS
-from scipy.ndimage import label
-import PIL.ImageDraw as ImageDraw
-from util.box_ops import mask_to_bbox_xywh, compute_iou_matrix, draw_bboxes
-from util.cityscapes_ops import Annotation, name2label
+from util.box_ops import compute_iou_matrix, draw_bboxes
 from pathlib import Path
 from pycocotools import mask as mask_utils
 import shutil
