@@ -78,11 +78,6 @@ class DDIMSampler(object):
                **kwargs
                ):
 
-        # uc = unconditional_conditioning['c_crossattn']
-        # if isinstance(uc, list):
-        #     shapes = [tensor.cpu().numpy().shape for tensor in uc]
-        #     print('uc shapes: ', shapes)
-        # wwww
         if conditioning is not None:
             if isinstance(conditioning, dict): # checked in
                 ctmp = conditioning[list(conditioning.keys())[0]]
@@ -91,7 +86,7 @@ class DDIMSampler(object):
                 if cbs != batch_size:
                     print(f"Warning: Got {cbs} conditionings but batch-size is {batch_size}")
 
-            elif isinstance(conditioning, list): # no
+            elif isinstance(conditioning, list): 
                 for ctmp in conditioning:
                     if ctmp.shape[0] != batch_size:
                         print(f"Warning: Got {cbs} conditionings but batch-size is {batch_size}")
@@ -104,15 +99,6 @@ class DDIMSampler(object):
         # sampling
         C, H, W = shape
         size = (batch_size, C, H, W)
-        print(f'Data shape for DDIM sampling is {size}, eta {eta}')
-
-
-        # uc = unconditional_conditioning['c_crossattn']
-        # if isinstance(uc, list):
-        #     shapes = [tensor.cpu().numpy().shape for tensor in uc]
-        #     print('uc shapes: ', shapes)
-        # wwww
-
 
         samples, intermediates = self.ddim_sampling(conditioning, size,
                                                     callback=callback,
@@ -160,18 +146,17 @@ class DDIMSampler(object):
         print(f"Running DDIM Sampling with {total_steps} timesteps")
 
         iterator = tqdm(time_range, desc='DDIM Sampler', total=total_steps)
-        # print('here')
-        # import pdb; pdb.set_trace()
+        
         for i, step in enumerate(iterator):
             index = total_steps - i - 1
             ts = torch.full((b,), step, device=device, dtype=torch.long)
 
-            if mask is not None: # no
+            if mask is not None:
                 assert x0 is not None
-                img_orig = self.model.q_sample(x0, ts)  # TODO: deterministic forward pass?
+                img_orig = self.model.q_sample(x0, ts)
                 img = img_orig * mask + (1. - mask) * img
 
-            if ucg_schedule is not None: # no
+            if ucg_schedule is not None:
                 assert len(ucg_schedule) == len(time_range)
                 unconditional_guidance_scale = ucg_schedule[i]
 
@@ -199,163 +184,28 @@ class DDIMSampler(object):
                       dynamic_threshold=None):
         b, *_, device = *x.shape, x.device
 
-        # print('unconditional_conditioning: ', unconditional_conditioning)
-        # print('unconditional_guidance_scale: ', unconditional_guidance_scale)
-        # import pdb; pdb.set_trace()
-        if unconditional_conditioning is None or unconditional_guidance_scale == 1.: # not go
+        if unconditional_conditioning is None or unconditional_guidance_scale == 1.: 
             model_output = self.model.apply_model(x, t, c)
         else:
             x_in = torch.cat([x] * 2)
             t_in = torch.cat([t] * 2)
-            # if isinstance(c, dict): # checked
-            #     assert isinstance(unconditional_conditioning, dict)
-            #     c_in = dict()
-            #     counter = 0
-            #     import pdb; pdb.set_trace()
-            #     for k in c:
-            #         import pdb; pdb.set_trace()
-            #         if isinstance(c[k], list):
-            #             # print('c[k] shape: ', np.shape(c[k]))
-            #             # c_in[k] = [torch.cat([
-            #             #     unconditional_conditioning[k][i],
-            #             #     c[k][i]]) for i in range(len(c[k]))]
-            #             c_in[k] = []
-            #             # print(len(c[k]))
-            #             # print(np.shape(c))
-            #             # import pdb; pdb.set_trace()
-            #             for i in range(len(c[k])):
-            #                 uc = unconditional_conditioning[k][i]  # Get unconditional conditioning for index i
-            #                 cond = c[k][i]  # Get conditioning for index i
-            #                 # print(i, 'uc shape: ', np.shape(uc))
-            #                 # print(i, 'cond shape: ', np.shape(cond))
-
-            #                 if counter == 1: 
-            #                     # if uc.dim() != cond['c0'].dim():
-            #                     # cond = cond['c0']
-            #                     for z in range(len(c[k][i])):
-            #                         cond = c[k][i][z]
-            #                         combined = torch.cat([uc, cond])
-            #                         c_in[k][i].append(combined)
-            #                 # else: 
-
-            #                 # if uc.dim() == cond.dim():
-            #                 #     pass
-            #                 # elif uc.dim() != cond['c0'].dim():
-            #                 #     cond = cond['c0'][:, :, :, 0]
-            #                 #     # uc = uc.unsqueeze(-1).repeat(1, 1, 1, cond.shape[3])
-
-            #                 # print('uc', np.shape(uc))
-            #                 # print('cond', np.shape(cond))
-            #                 # import pdb; pdb.set_trace()
-            #                 # wwwwww
-            #                 # combined = torch.cat([uc, cond])  # Concatenate the two tensors
-            #                 # c_in[k].append(combined)  # Append the result to the list
-            #         else:
-            #             c_in[k] = torch.cat([
-            #                     unconditional_conditioning[k],
-            #                     c[k]])
-            #         counter += 1
-            # elif isinstance(c, list):
-            #     c_in = list()
-            #     assert isinstance(unconditional_conditioning, list)
-            #     for i in range(len(c)):
-            #         c_in.append(torch.cat([unconditional_conditioning[i], c[i]]))
-            # else:
-                # c_in = torch.cat([unconditional_conditioning, c])
-
-
             c_in = {'c_concat': c['c_concat'], 'c_crossattn': {}, 'c_mask': c['c_mask']}
-            # c_in = {'c_concat': torch.cat([torch.cat(c['c_concat'], dim=0)] * 2), 'c_crossattn': {}, 'c_mask': torch.cat([torch.cat(c['c_mask'], dim=0)] * 2)}
-
-            # xxx = c['c_crossattn']
-            # print(unconditional_conditioning)
-            # import pdb; pdb.set_trace()
-
-            # 遍历 c['c_crossattn'] 中的每个键
-            # print(c['c_crossattn'])
-            # import pdb; pdb.set_trace()
-            for element in c['c_crossattn']:  # 每个 element 是一个字典
+            for element in c['c_crossattn']:
                 updated_element = {}
-                for k, v in element.items():  # 遍历字典中的键和值
-                    # updated_element[k] = []  # 初始化为一个空列表
-
-                    # import pdb; pdb.set_trace()
-                    # 假设 v 是一个列表，逐个处理
-                    # for i in range(len(v)):
-                    # uc = unconditional_conditioning['c_crossattn'][k][i]  # 无条件条件
+                for k, v in element.items():
                     uc = unconditional_conditioning['c_crossattn']
-                    cond = v  # 条件
-                    # print('cond shape: ', np.shape(cond))
+                    cond = v
                     if isinstance(uc, list):
                         shapes = [tensor.cpu().numpy().shape for tensor in uc]
-                        # print('uc shapes: ', shapes)
-
-                    # print(np.shape(uc), np.shape(cond))
-                    # if isinstance(uc, list) and isinstance(cond, list):
-                    #     for u, c in zip(uc, cond):
-                    #         print(u.shape, c.shape)  # 直接打印形状
-                    #         # 或者转换为 NumPy 数组
-                    #         print(u.cpu().numpy().shape, c.cpu().numpy().shape)
-                    # elif torch.is_tensor(uc) and torch.is_tensor(cond):
-                    #     print(uc.shape, cond.shape)  # 打印张量形状
-                    #     print(uc.cpu().numpy().shape, cond.cpu().numpy().shape)
-                    # else:
-                    #     print("Unsupported type for uc or cond.")
-                    # print(uc)
-                    # print(cond)
-                    
-
                     if isinstance(uc, list):
-                        uc = torch.stack(uc)  # 将列表转换为张量
-
-                    # if isinstance(cond, list):
-                    #     cond = torch.stack(cond)  # 将列表转换为张量
-
-                    # print(np.shape(uc), np.shape(cond))
-                    # import pdb; pdb.set_trace()
-
-                    # # 检查维度并调整
-                    # if uc.dim() != cond.dim():
-                    #     if uc.dim() < cond.dim():
-                    #         uc = uc.unsqueeze(-1).expand_as(cond)  # 扩展 uc
-                    #     elif uc.dim() > cond.dim():
-                    #         cond = cond.unsqueeze(-1).expand_as(uc)  # 扩展 cond
-
-                    # 拼接并存储
+                        uc = torch.stack(uc)
                     uc = uc[0]
-                    # cond = cond.unsqueeze(0)#.unsqueeze(0)
                     combined = torch.cat([uc, cond], dim=0)
-                    # updated_element[k].append(combined)  # 添加拼接后的张量
                     updated_element[k] = combined
-
-                # 将更新后的字典添加到 c_in['c_crossattn']
                 c_in['c_crossattn'] = [updated_element]
-                # print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', np.shape(updated_element))
-                # for i, (key, tensor) in enumerate(updated_element.items()):
-                #     print(f'Key: {key}, Tensor {i} shape: {tensor.shape}')
-                #     print('wfasjlfja;lfja;lfjasl;fj;alfjas;ljf;alsfja;l')
-
-            # c_in['c_concat'] = torch.cat([c_in['c_concat']] * 2)
-
             c_in['c_concat'] = [torch.cat([unconditional_conditioning['c_concat'][0], c['c_concat'][0]])]
             c_in['c_mask'] = [torch.cat([unconditional_conditioning['c_mask'][0], c['c_mask'][0]])]
-            # print('ddim c_concat shape: ', c_in['c_concat'].shape)
-            # for i, tensor in enumerate(c_in['c_concat']):
-            #     print(f'Tensor {i} shape: {tensor.shape}')
-            #     print('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww')
-
-            # for i, tensor in enumerate(c_in['c_crossattn']):
-            #     print(f'Tensor {i} shape: {tensor.shape}')
-            #     print('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww')
-
-
-            # import pdb; pdb.set_trace()
-            # print('x_in shape: ', np.shape(x_in), 't_in shape: ', np.shape(t_in), 'c_in shape: ', np.shape(c_in))
-            # [2, 4, 64, 64], [2], ()
-            # import pdb; pdb.set_trace()
-            # import pdb; pdb.set_trace()
             model_uncond, model_t = self.model.apply_model(x_in, t_in, c_in).chunk(2)
-            # import pdb; pdb.set_trace()
             model_output = model_uncond + unconditional_guidance_scale * (model_t - model_uncond)
 
         if self.model.parameterization == "v":

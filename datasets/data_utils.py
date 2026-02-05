@@ -124,9 +124,38 @@ def get_bbox_from_mask(mask):
     h,w = mask.shape[0],mask.shape[1]
 
     if mask.sum() < 10:
-        return 0,h,0,w
-    rows = np.any(mask,axis=1)
-    cols = np.any(mask,axis=0)
-    y1,y2 = np.where(rows)[0][[0,-1]]
-    x1,x2 = np.where(cols)[0][[0,-1]]
-    return (y1,y2,x1,x2)
+        return 0, h, 0, w
+    rows = np.any(mask, axis=1)
+    cols = np.any(mask, axis=0)
+    y1,y2 = np.where(rows)[0][[0, -1]]
+    x1,x2 = np.where(cols)[0][[0, -1]]
+    return (y1, y2, x1, x2)
+
+def box_in_box(small_box, big_box):
+    y1, y2, x1, x2 = small_box
+    y1_b, _, x1_b, _ = big_box
+    y1, y2, x1, x2 = y1 - y1_b ,y2 - y1_b, x1 - x1_b, x2 - x1_b
+    return (y1, y2, x1, x2)
+
+def crop_back(pred, tar_image, extra_sizes, tar_box_yyxx_crop, tar_box_yyxx_crop2, is_masked=False):
+    H1, W1, H2, W2 = extra_sizes
+    y1, x1, y2, x2 = tar_box_yyxx_crop
+    y1_, x1_, y2_, x2_ = tar_box_yyxx_crop2
+    m = 0 # maigin_pixel
+
+    if H1 < W1:
+        pad1 = int((W1 - H1) / 2)
+        pad2 = W1 - H1 - pad1
+        pred = pred[pad1: -pad2, :, :]
+    elif H1 > W1:
+        pad1 = int((H1 - W1) / 2)
+        pad2 = H1 - W1 - pad1
+        pred = pred[:,pad1: -pad2, :]
+
+    if is_masked:
+        gen_image = tar_image.copy()
+        gen_image[y1+m :y2-m, x1+m:x2-m, :] = pred[y1+m :y2-m, x1+m:x2-m, :]
+        gen_image[y1_+m :y2_-m, x1_+m:x2_-m, :] = pred[y1_+m :y2_-m, x1_+m:x2_-m, :]
+    else: 
+        gen_image = pred
+    return gen_image

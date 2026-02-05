@@ -82,13 +82,9 @@ def crop_back2(pred, tar_image, extra_sizes, tar_box_yyxx_crop, tar_box_yyxx_cro
 
 
 def get_input(batch, k):
-    # print(k)
-    # import pdb; pdb.set_trace()
     x = batch[k]
     if len(x.shape) == 3:
         x = x[None, ...]
-    # print('ww', np.shape(x)) # [1, 224, 224, 3]
-    # import pdb; pdb.set_trace()
 
     x = torch.tensor(x)
     x = einops.rearrange(x, 'b h w c -> b c h w')
@@ -505,7 +501,7 @@ if __name__ == '__main__':
     # save_path = 'results/02_MOSE_ep49'
     # save_path = 'results/wild_334_ep4'
     # save_path = 'results/rebuttal_v8'
-    save_path = 'results/Wild0'
+    save_path = 'results/Wild1'
     os.makedirs(save_path, exist_ok=True)
     for k in range(20): # 20
         for i in range(0, 12):
