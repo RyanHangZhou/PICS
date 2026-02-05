@@ -65,7 +65,25 @@ def main(args):
     dataset6 = BDD100KDataset(**DConf.Train.BDD100K, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
 
     if args.is_joint:
-        dataset = ConcatDataset( [dataset1, dataset2, dataset3, dataset4, dataset5, dataset6] )
+        datasets = [dataset1, dataset2, dataset3, dataset4, dataset5, dataset6]
+        dataset = ConcatDataset(datasets)
+        
+        sizes = [len(d) for d in datasets]
+        
+        weights = [1.0 / s for s in sizes]
+        
+        sample_weights = []
+        for i, size in enumerate(sizes):
+            sample_weights.extend([weights[i]] * size)
+        
+        sampler = torch.utils.data.WeightedRandomSampler(
+            weights=sample_weights, 
+            num_samples=sum(sizes), 
+            replacement=True
+        )
+        
+        dataloader = DataLoader(dataset, num_workers=8, batch_size=args.batch_size, sampler=sampler)
+        
     else:
         if args.dataset_name == 'lvis':
             dataset = dataset1
@@ -80,11 +98,12 @@ def main(args):
         elif args.dataset_name == 'bdd100k':
             dataset = dataset6
         elif args.dataset_name == 'small':
-            dataset = ConcatDataset( [dataset1, dataset2, dataset4, dataset5, dataset6] )
+            dataset = ConcatDataset([dataset1, dataset2, dataset4, dataset5, dataset6])
         else:
             raise ValueError(f"Unsupported dataset name: {args.dataset_name}")
+            
+        dataloader = DataLoader(dataset, num_workers=8, batch_size=args.batch_size, shuffle=True)
 
-    dataloader = DataLoader(dataset, num_workers=8, batch_size=args.batch_size, shuffle=True)
     logger = ImageLogger(batch_frequency=args.logger_freq, log_images_kwargs=obj_thr)
     trainer = pl.Trainer(default_root_dir=args.root_dir, limit_train_batches=args.limit_train_batches, gpus=1, precision=16, accelerator="auto", callbacks=[logger], accumulate_grad_batches=accumulate_grad_batches, max_epochs=50)
     trainer.fit(model, dataloader)
