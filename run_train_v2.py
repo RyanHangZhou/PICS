@@ -15,7 +15,13 @@ from torch.utils.data import ConcatDataset
 from cldm.hack import disable_verbosity, enable_sliced_attention
 from omegaconf import OmegaConf
 import torch
-from pytorch_lightning.plugins import DDPPlugin
+
+from datasets.base import BaseDataset
+
+class BaseLogic(BaseDataset):
+    def __init__(self, area_ratio, obj_thr):
+        self.area_ratio = area_ratio
+        self.obj_thr = obj_thr
 
 print("Number of GPUs available: ", torch.cuda.device_count())
 print("Current device: ", torch.cuda.current_device())
@@ -57,35 +63,46 @@ def main(args):
     model.only_mid_control = only_mid_control
 
     # Datasets
-    DConf = OmegaConf.load('./configs/datasets.yaml')
-    dataset1 = LVISDataset(**DConf.Train.LVIS, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
-    dataset2 = VITONHDDataset(**DConf.Train.VITONHD, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
-    dataset3 = Objects365Dataset(**DConf.Train.Objects365, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
-    dataset4 = CityscapesDataset(**DConf.Train.Cityscapes, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
-    dataset5 = MapillaryVistasDataset(**DConf.Train.MapillaryVistas, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
-    dataset6 = BDD100KDataset(**DConf.Train.BDD100K, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
 
     if args.is_joint:
-        datasets = [dataset1, dataset2, dataset3, dataset4, dataset5, dataset6]
-        dataset = ConcatDataset(datasets)
-        
-        sizes = [len(d) for d in datasets]
-        
-        weights = [1.0 / s for s in sizes]
-        
-        sample_weights = []
-        for i, size in enumerate(sizes):
-            sample_weights.extend([weights[i]] * size)
-        
-        sampler = torch.utils.data.WeightedRandomSampler(
-            weights=sample_weights, 
-            num_samples=sum(sizes), 
-            replacement=True
+        DConf = OmegaConf.load('./configs/datasets2.yaml')
+        all_urls = [
+            DConf.Train.LVIS.shards,
+            DConf.Train.VITONHD.shards,
+            DConf.Train.Objects365.shards,
+            DConf.Train.Cityscapes.shards,
+            DConf.Train.MapillaryVistas.shards,
+            DConf.Train.BDD100K.shards
+        ]
+
+        logic_helper = BaseLogic(
+            area_ratio=DConf.Defaults.area_ratio, 
+            obj_thr=DConf.Defaults.obj_thr
+        )
+
+        dataset = MultiWebDataset(
+            urls=all_urls,
+            construct_collage_fn=logic_helper._construct_collage, 
+            shuffle_size=10000,
+            seed=42,
+            decode_mode="pil",
+        )
+
+        dataloader = DataLoader(
+            dataset, 
+            num_workers=8, 
+            batch_size=args.batch_size, 
         )
         
-        dataloader = DataLoader(dataset, num_workers=8, batch_size=args.batch_size, sampler=sampler)
-        
     else:
+        DConf = OmegaConf.load('./configs/datasets.yaml')
+        dataset1 = LVISDataset(**DConf.Train.LVIS, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
+        dataset2 = VITONHDDataset(**DConf.Train.VITONHD, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
+        dataset3 = Objects365Dataset(**DConf.Train.Objects365, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
+        dataset4 = CityscapesDataset(**DConf.Train.Cityscapes, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
+        dataset5 = MapillaryVistasDataset(**DConf.Train.MapillaryVistas, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
+        dataset6 = BDD100KDataset(**DConf.Train.BDD100K, area_ratio=DConf.Defaults.area_ratio, obj_thr=DConf.Defaults.obj_thr)
+
         if args.dataset_name == 'lvis':
             dataset = dataset1
         elif args.dataset_name == 'vitonhd':

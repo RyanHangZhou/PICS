@@ -1,0 +1,28 @@
+Defaults:
+  area_ratio: 0.01171
+  obj_thr: 2
+
+Train:
+  LVIS:
+    construct_dataset_dir: 'data/train/LVIS'
+    shards: "data/train/LVIS/{00000..00005}.tar"
+
+  VITONHD:
+    construct_dataset_dir: '/data/train/VITONHD'
+    shards: "data/train/VITONHD/{00000..00002}.tar"
+
+  Objects365:
+    construct_dataset_dir: 'data/train/Objects365'
+    shards: "data/train/Objects365/{00000..00188}.tar"
+
+  Cityscapes:
+    construct_dataset_dir: 'data/train/Cityscapes'
+    shards: "data/train/Cityscapes/00000.tar"
+
+  MapillaryVistas:
+    construct_dataset_dir: 'data/train/MapillaryVistas'
+    shards: "data/train/MapillaryVistas/00000.tar"
+
+  BDD100K:
+    construct_dataset_dir: 'data/train/BDD100K'
+    shards: "data/train/BDD100K/00000.tar"
