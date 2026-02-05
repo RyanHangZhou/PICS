@@ -12,15 +12,14 @@ rebuttal/
 scripts_comp/
 visualize/
 
-# --- Python 编译与环境 ---
+# --- Python env ---
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-# 虽然你有 environment.yaml，但建议忽略本地虚拟环境文件夹（如果有的话）
 venv/
 .venv/
 env/
 
-# --- 操作系统冗余 ---
+# --- system ---
 .DS_Store
 Thumbs.db
