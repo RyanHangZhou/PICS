@@ -77,6 +77,7 @@ We provide the processed ***two-object compositing data*** in WebDataset format 
 | BDD100K | 1,012 | 204MB | [Download](https://drive.google.com/drive/folders/1zS60KPfZioU4tW1ngDK1KahE7T-TeIim?usp=sharing) |
 
 ## Data Organization
+```
 PICS/
 ├── data/
     ├── train/
@@ -88,6 +89,7 @@ PICS/
         ├── Cityscapes/
         ├── MapillaryVistas/
         ├── BDD100K/
+```
 
 ## Training
 
