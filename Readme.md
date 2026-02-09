@@ -8,6 +8,7 @@
 
 **02/08/2026**
 - Release training and inference code.
+- Release training data.
 
 <!-- **06/24/2025**
 - Release inference code and data. -->
@@ -15,8 +16,8 @@
 <!-- TODO List -->
 ## 🚧 TODO List
 - [x] Release training and inference code
+- [x] Release datasets (LVIS, Objects365, etc. in WebDataset format)
 - [ ] Release pretrained models (coming soon)
-- [ ] Release datasets (LVIS, Objects365, etc. in WebDataset format)
 - [ ] Release any-object compositing code
 
 <!-- Installation -->
@@ -77,16 +78,16 @@ We provide the processed ***two-object compositing data*** in WebDataset format 
 
 ## Data Organization
 PICS/
-└── data/
-    └── train/
+├── data/
+    ├── train/
         ├── LVIS/
-        │   ├── 00000.tar
-        │   └── ...
+            ├── 00000.tar
+            ├── ...
         ├── VITONHD/
         ├── Objects365/
         ├── Cityscapes/
         ├── MapillaryVistas/
-        └── BDD100K/
+        ├── BDD100K/
 
 ## Training
 
