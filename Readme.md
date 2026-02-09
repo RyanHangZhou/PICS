@@ -15,30 +15,38 @@
 <!-- TODO List -->
 ## 🚧 TODO List
 - [x] Release training and inference code
-- [ ] Release pretrained models
-- [ ] Release dataset
+- [ ] Release pretrained models (coming soon)
+- [ ] Release datasets (LVIS, Objects365, etc. in WebDataset format)
 - [ ] Release any-object compositing code
 
 <!-- Installation -->
 ## 📦 Installation
 
 ### Prerequisites
-- **System**: The code is currently tested only on **Linux**. 
-- **Hardware**: An NVIDIA GPU with at least 40GB of memory is necessary. The code has been verified on NVIDIA A6000 and H100 GPUs.  
+- **System**: Linux (Tested on Ubuntu 20.04/22.04).
+- **Hardware**: 
+  - **GPU**: NVIDIA GPU with at least **40GB VRAM** (e.g., A6000, A100, H100). 
+  - **RAM**: Minimum 64GB system memory recommended.
 - **Software**:   
-  - [Conda](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) is recommended for managing dependencies.  
-  - Python version 3.6 or higher is required. 
+  - [Conda](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) is recommended.  
+  - **Python 3.10** or higher.
 
+### Environment Setup
   Create a new conda environment named `PICS` and install the dependencies: 
   ```
   conda env create --file=PICS.yml
+  conda activate PICS
   ```
-  Download the [ViT-g/14](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) version of DINOv2 for object feature extraction and put it in the directory ```PICS/checkpoints/dinov2_vitg14_pretrain.pth```. 
+
+### Weights Preparation
+1. ***DINOv2***: Download [ViT-g/14](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) and place it at: checkpoints/dinov2_vitg14_pretrain.pth
+2. ***PICS Checkpoints***: (Links will be updated once uploaded to Google Drive/Hugging Face).
+  <!-- Download the [ViT-g/14](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) version of DINOv2 for object feature extraction and put it in the directory ```PICS/checkpoints/dinov2_vitg14_pretrain.pth```.  -->
 
 
 <!-- Pretrained Models -->
 ## 🤖 Pretrained Models
-
+Coming soon! We are currently finalizing the model weights for public release.
 <!-- We provide the following pretrained models:
 
 | Model | Description | #Params | Download |
@@ -56,9 +64,8 @@ Here is an [example](test.py) of how to use the pretrained models for object pla
 
 <!-- Dataset -->
 ## 📚 Dataset
-Our training set is a combination of [LVIS](https://www.lvisdataset.org/), [VITON-HD](https://www.kaggle.com/datasets/marquis03/high-resolution-viton-zalando-dataset), [Objects365](https://www.objects365.org/overview.html), [Cityscapes](https://www.cityscapes-dataset.com/), [Mapillary Vistas](https://www.mapillary.com/dataset/vistas) and [BDD100K](https://bair.berkeley.edu/blog/2018/05/30/bdd/). 
-<!-- Note that we have provided instructions to prepare customized Cityscapes dataset for object composition in supplementary material. -->
-We provide below links for downloading the processed two-object compositing data: 
+Our training set is a mixture of [LVIS](https://www.lvisdataset.org/), [VITON-HD](https://www.kaggle.com/datasets/marquis03/high-resolution-viton-zalando-dataset), [Objects365](https://www.objects365.org/overview.html), [Cityscapes](https://www.cityscapes-dataset.com/), [Mapillary Vistas](https://www.mapillary.com/dataset/vistas) and [BDD100K](https://bair.berkeley.edu/blog/2018/05/30/bdd/). 
+We provide the processed ***two-object compositing data*** in WebDataset format (.tar shards) below:
 | Model | #Sample | Size | Download |
 | --- | --- | --- | --- |
 | LVIS | 34,160 | 7.98GB | [Download](https://drive.google.com/drive/folders/1Ir1cwR7K8HALNJiS6kTTlMgKIn8f18XX?usp=sharing) |
@@ -68,56 +75,18 @@ We provide below links for downloading the processed two-object compositing data
 | Mapillary Vistas | 603 | 581.5MB | [Download](https://drive.google.com/drive/folders/1a0756wc2bvvHJ_8a01N0tZ_Kb_BkRZv1?usp=sharing) |
 | BDD100K | 1,012 | 204MB | [Download](https://drive.google.com/drive/folders/1zS60KPfZioU4tW1ngDK1KahE7T-TeIim?usp=sharing) |
 
-
-<!-- We provide **TRELLIS-500K**, a large-scale dataset containing 500K 3D assets curated from [Objaverse(XL)](https://objaverse.allenai.org/), [ABO](https://amazon-berkeley-objects.s3.amazonaws.com/index.html), [3D-FUTURE](https://tianchi.aliyun.com/specials/promotion/alibaba-3d-future), [HSSD](https://huggingface.co/datasets/hssd/hssd-models), and [Toys4k](https://github.com/rehg-lab/lowshot-shapebias/tree/main/toys4k), filtered based on aesthetic scores. Please refer to the [dataset README](DATASET.md) for more details. -->
-<!-- We provide a large-scale street-scene vehicle placement dataset [Download](https://drive.google.com/file/d/1wOzpMPy3Vy0tdBRD0xC1eW3SO2aVeCVX/view?usp=sharing) curated from [Cityscapes](https://www.cityscapes-dataset.com/). 
-The file structures are: 
-```
-├── train
-    ├── backgrounds:
-        ├── imgID.png
-        ├── ……
-    ├── objects:
-        ├── imgID:
-            ├── object_name_ID.png
-            ├── ……
-        ├── ……
-    ├── location:
-        ├── imgID:
-            ├── object_name_ID.txt
-            ├── ……
-        ├── ……
-    ├── annotations.json
-├── test
-    ├── backgrounds:
-        ├── imgID.png
-        ├── ……
-    |── backgrounds_single
-        ├── imgID.png
-        ├── ……
-    ├── objects:
-        ├── imgID:
-            ├── object_name_ID.png
-            ├── ……
-        ├── ……
-    ├── objects_single:
-        ├── imgID:
-            ├── object_name_ID.png
-            ├── ……
-        ├── ……
-    ├── location:
-        ├── imgID:
-            ├── object_name_ID.txt
-            ├── ……
-        ├── ……
-    ├── location_single:
-        ├── imgID:
-            ├── object_name_ID.txt
-            ├── ……
-        ├── ……
-    ├── annotations.json
-``` -->
-
+## Data Organization
+PICS/
+└── data/
+    └── train/
+        ├── LVIS/
+        │   ├── 00000.tar
+        │   └── ...
+        ├── VITONHD/
+        ├── Objects365/
+        ├── Cityscapes/
+        ├── MapillaryVistas/
+        └── BDD100K/
 
 ## Training
 
