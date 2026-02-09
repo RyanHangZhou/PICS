@@ -112,7 +112,6 @@ python -m datasets.lvis \
 To train a model on the whole dataset:
 ```
 python run_train.py \
-    --resume_path '/scratch/hang18/PICS/LOGS/LVIS_two_obj3_1/checkpoints/pics-step=008000.ckpt' \
     --root_dir 'LOGS/whole_data' \
     --batch_size 16 \
     --limit_train_batches 1 \
@@ -123,8 +122,8 @@ python run_train.py \
 ## Inference
 ```
 python run_test.py \
-    --input "data/Wild" \
-    --output "results/Wild" \
+    --input "sample" \
+    --output "results/sample" \
     --obj_thr 2
 ```
 

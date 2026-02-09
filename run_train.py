@@ -26,7 +26,7 @@ print("Device name: ", torch.cuda.get_device_name(0))
 def get_args_parser():
     parser = argparse.ArgumentParser('PICS Training Script', add_help=False)
 
-    parser.add_argument('--resume_path', required=True, type=str)
+    parser.add_argument('--resume_path', required=None, type=str)
     parser.add_argument('--root_dir', required=True, type=str)
     parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--limit_train_batches', default=1, type=float)
@@ -49,9 +49,12 @@ def main(args):
     obj_thr = {'obj_thr': 2}
 
     model = create_model('./configs/pics.yaml').cpu()
-    
-    checkpoint = load_state_dict(args.resume_path, location='cpu')
-    model.load_state_dict(checkpoint, strict=False)
+    if args.resume_path and os.path.exists(args.resume_path):
+        print(f"Loading checkpoint from: {args.resume_path}")
+        checkpoint = load_state_dict(args.resume_path, location='cpu')
+        model.load_state_dict(checkpoint, strict=False)
+    else:
+        print("No checkpoint found or provided. Training from scratch...")
 
     model.learning_rate = args.learning_rate
     model.sd_locked = sd_locked
