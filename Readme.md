@@ -73,7 +73,7 @@ We provide the processed ***two-object compositing data*** in WebDataset format 
 | VITON-HD | 11,647 | 2.53GB | [Download](https://drive.google.com/drive/folders/1317fJvvc7J1OTdbiM_Rst0C9AewIcNr2?usp=sharing) |
 | Objects365 | 940,764 | 243GB | [Download](https://drive.google.com/drive/folders/1xKLoGv8e5wkGkjdxEGpz5i9TH08vd1AA?usp=sharing) |
 | Cityscapes | 536 | 1.21GB | [Download](https://drive.google.com/drive/folders/1HYgEgZcknvEMbK2XZf2isY0pYcluGoKU?usp=sharing) |
-| Mapillary Vistas | 603 | 581.5MB | [Download](https://drive.google.com/drive/folders/1a0756wc2bvvHJ_8a01N0tZ_Kb_BkRZv1?usp=sharing) |
+| Mapillary Vistas | 603 | 582MB | [Download](https://drive.google.com/drive/folders/1a0756wc2bvvHJ_8a01N0tZ_Kb_BkRZv1?usp=sharing) |
 | BDD100K | 1,012 | 204MB | [Download](https://drive.google.com/drive/folders/1zS60KPfZioU4tW1ngDK1KahE7T-TeIim?usp=sharing) |
 
 ### Data organization
