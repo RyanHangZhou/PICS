@@ -91,6 +91,13 @@ PICS/
         ├── BDD100K/
 ```
 
+### Data preparation instruction
+We provide a script using SAM to extract high-quality object silhouettes for the Objects365 dataset.
+To process a specific range of data shards, run:
+```
+python scripts/annotate_sam.py --is_train --index_low 00000 --index_high 10000
+```
+
 ## Training
 
 To train a model on the whole dataset:
