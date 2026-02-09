@@ -33,7 +33,7 @@
   ```
   conda env create --file=PICS.yml
   ```
-  Download the ViT-g/14 version of DINOv2 for object feature extraction [here](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) and put it in the directory ```PICS/checkpoints/dinov2_vitg14_pretrain.pth```. 
+  Download the [ViT-g/14](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) version of DINOv2 for object feature extraction and put it in the directory ```PICS/checkpoints/dinov2_vitg14_pretrain.pth```. 
 
 
 <!-- Pretrained Models -->
@@ -58,16 +58,15 @@ Here is an [example](test.py) of how to use the pretrained models for object pla
 ## 📚 Dataset
 Our training set is a combination of [LVIS](https://www.lvisdataset.org/), [VITON-HD](https://www.kaggle.com/datasets/marquis03/high-resolution-viton-zalando-dataset), [Objects365](https://www.objects365.org/overview.html), [Cityscapes](https://www.cityscapes-dataset.com/), [Mapillary Vistas](https://www.mapillary.com/dataset/vistas) and [BDD100K](https://bair.berkeley.edu/blog/2018/05/30/bdd/). 
 <!-- Note that we have provided instructions to prepare customized Cityscapes dataset for object composition in supplementary material. -->
-
 We provide below links for downloading the processed two-object compositing data: 
 | Model | #Sample | Download |
 | --- | --- | --- |
-| LVIS | 34,160 | [Download]() |
-| VITON-HD | 11,647 | [Download]() |
+| LVIS | 34,160 | [Download](https://drive.google.com/drive/folders/1Ir1cwR7K8HALNJiS6kTTlMgKIn8f18XX?usp=sharing) |
+| VITON-HD | 11,647 | [Download](https://drive.google.com/drive/folders/1317fJvvc7J1OTdbiM_Rst0C9AewIcNr2?usp=sharing) |
 | Objects365 | 940,764 | [Download]() |
-| Cityscapes | 536 | [Download]() |
-| Mapillary Vistas | 603 | [Download]() |
-| BDD100K | 1,012 | [Download]() |
+| Cityscapes | 536 | [Download](https://drive.google.com/drive/folders/1HYgEgZcknvEMbK2XZf2isY0pYcluGoKU?usp=sharing) |
+| Mapillary Vistas | 603 | [Download](https://drive.google.com/drive/folders/1a0756wc2bvvHJ_8a01N0tZ_Kb_BkRZv1?usp=sharing) |
+| BDD100K | 1,012 | [Download](https://drive.google.com/drive/folders/1zS60KPfZioU4tW1ngDK1KahE7T-TeIim?usp=sharing) |
 
 
 <!-- We provide **TRELLIS-500K**, a large-scale dataset containing 500K 3D assets curated from [Objaverse(XL)](https://objaverse.allenai.org/), [ABO](https://amazon-berkeley-objects.s3.amazonaws.com/index.html), [3D-FUTURE](https://tianchi.aliyun.com/specials/promotion/alibaba-3d-future), [HSSD](https://huggingface.co/datasets/hssd/hssd-models), and [Toys4k](https://github.com/rehg-lab/lowshot-shapebias/tree/main/toys4k), filtered based on aesthetic scores. Please refer to the [dataset README](DATASET.md) for more details. -->
