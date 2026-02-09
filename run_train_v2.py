@@ -66,13 +66,16 @@ def main(args):
 
     if args.is_joint:
         DConf = OmegaConf.load('./configs/datasets2.yaml')
+        # all_urls = [
+        #     DConf.Train.LVIS.shards,
+        #     DConf.Train.VITONHD.shards,
+        #     DConf.Train.Objects365.shards,
+        #     DConf.Train.Cityscapes.shards,
+        #     DConf.Train.MapillaryVistas.shards,
+        #     DConf.Train.BDD100K.shards
+        # ]
         all_urls = [
             DConf.Train.LVIS.shards,
-            DConf.Train.VITONHD.shards,
-            DConf.Train.Objects365.shards,
-            DConf.Train.Cityscapes.shards,
-            DConf.Train.MapillaryVistas.shards,
-            DConf.Train.BDD100K.shards
         ]
 
         logic_helper = BaseLogic(

@@ -1,10 +1,10 @@
 <h1 align="center">PICS: Pairwise Image Compositing with Spatial Interactions</h1>
 <p align="center"><img src="assets/figure.jpg" width="100%"></p>
 
-<!-- ***Check out our [Project Page](https://ryanhangzhou.github.io/bootplace/) for more visual demos!*** -->
+***Check out our [Project Page](https://ryanhangzhou.github.io/pics/) for more visual demos!***
 
 <!-- Updates -->
-## ⏩ Updates
+<!-- ## ⏩ Updates -->
 
 <!-- **03/20/2025**
 - Release training code and pretrained models.
@@ -36,8 +36,16 @@
   conda env create --file=BOOTPLACE.yml
   ```
   Download DETR-R50 pretrained models for finetuning [here](https://dl.fbaipublicfiles.com/detr/detr-r50-e632da11.pth) and put it in the directory ```weights/detr-r50-e632da11.pth```. 
+-->
 
-  
+
+Download pretrained model
+```
+mkdir checkpoints
+
+```
+
+
 
 <!-- Pretrained Models -->
 ## 🤖 Pretrained Models
@@ -46,7 +54,7 @@
 
 | Model | Description | #Params | Download |
 | --- | --- | --- | --- |
-| BOOTPLACE_Cityscapes | Multiple supervision | 523M | [Download](https://drive.google.com/file/d/1OeCourPQf1a6yM2BYNNuUKI3yvXRcD_N/view?usp=drive_link) | --> -->
+| BOOTPLACE_Cityscapes | Multiple supervision | 523M | [Download](https://drive.google.com/file/d/1OeCourPQf1a6yM2BYNNuUKI3yvXRcD_N/view?usp=drive_link) | -->
 
 
 <!-- Usage -->
@@ -54,9 +62,7 @@
 
 ### Minimal Example
 
-Here is an [example](test.py) of how to use the pretrained models for object placement.
-
- -->
+Here is an [example](test.py) of how to use the pretrained models for object placement. -->
 
 
 <!-- Dataset -->

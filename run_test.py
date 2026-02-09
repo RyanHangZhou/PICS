@@ -10,6 +10,7 @@ from cldm.hack import disable_verbosity, enable_sliced_attention
 from datasets.data_utils import * 
 from omegaconf import OmegaConf
 from tqdm import tqdm
+import albumentations as A
 
 save_memory = False
 disable_verbosity()
@@ -24,6 +25,23 @@ model = create_model(model_config ).cpu()
 model.load_state_dict(load_state_dict(model_ckpt, location='cuda'))
 model = model.cuda()
 ddim_sampler = DDIMSampler(model)
+
+def aug_patch(patch):
+    gray = cv2.cvtColor(patch, cv2.COLOR_RGB2GRAY)
+    mask = (gray < 250).astype(np.float32)[:, :, None] 
+
+    transform = A.Compose([
+        A.HorizontalFlip(p=0.2),
+        A.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, p=0.3),
+        A.Rotate(limit=15, border_mode=cv2.BORDER_REPLICATE, p=0.5),
+    ])
+
+    transformed = transform(image=patch.astype(np.uint8), mask=mask)
+    aug_img = transformed["image"]
+    aug_mask = transformed["mask"]
+    final_img = aug_img * aug_mask + 255 * (1 - aug_mask)
+
+    return final_img.astype(np.uint8)
 
 def get_input(batch, k):
     x = batch[k]
@@ -118,7 +136,9 @@ def process_pairs_multiple(mask, tar_image, patch_dir, counter=0, max_ratio=0.8)
     # 1. Process Reference Object (View)
     view = cv2.imread(patch_dir)
     view = cv2.cvtColor(view, cv2.COLOR_BGR2RGB)
-    view = expand_image(view)
+    ratio = np.random.randint(11, 15) / 10
+    view = expand_image(view, ratio=ratio)
+    view = aug_patch(view)
     view = pad_to_square(view, pad_value=255, random=False)
     view = cv2.resize(view.astype(np.uint8), (224, 224))
     view = view.astype(np.float32) / 255.0
