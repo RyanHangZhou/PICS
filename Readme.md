@@ -97,6 +97,15 @@ To process a specific range of data shards, run:
 ```
 python scripts/annotate_sam.py --is_train --index_low 00000 --index_high 10000
 ```
+To process raw data (e.g., LVIS), run the following command. Replace /path/to/raw_data with your actual local data path:
+```
+python -m datasets.lvis \
+    --dataset_dir "/path/to/raw_data" \
+    --construct_dataset_dir "data/train/LVIS" \
+    --area_ratio 0.02 \
+    --is_build_data \
+    --is_train
+```
 
 ## Training
 

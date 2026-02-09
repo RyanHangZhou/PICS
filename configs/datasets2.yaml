@@ -1,8 +1,0 @@
-Defaults:
-  area_ratio: 0.01171
-  obj_thr: 2
-
-Train:
-  LVIS:
-    construct_dataset_dir: 'data/train/LVIS'
-    shards: "data/train/LVIS3/00000.tar"

@@ -7,8 +7,8 @@ import cv2
 class MultiWebDataset(IterableDataset):
     def __init__(
         self,
-        urls,                       # 字符串 pattern 或 list[路径]
-        construct_collage_fn,       # ★ 把 dummy._construct_collage 传进来
+        urls,
+        construct_collage_fn,
         shuffle_size=0,
         seed=0,
         decode_mode="pil",
@@ -53,7 +53,6 @@ class MultiWebDataset(IterableDataset):
 
         ds = ds.decode("pil")
 
-        # ★ 把文件名映射到简短 key，和你 LVISWebDataset 保持一致
         ds = ds.rename(
             bg="bg.jpg",
             obj0="obj0.png",
@@ -78,5 +77,4 @@ class MultiWebDataset(IterableDataset):
             collage = self.construct_collage_fn(
                 bg_np, obj0_np, obj1_np, mask0_np, mask1_np
             )
-            # ★ 这里返回的东西，要和你原来 LVISDataset / Dataloader 期望的一致
             yield collage
