@@ -32,14 +32,14 @@
   - [Conda](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) is recommended.  
   - **Python 3.10** or higher.
 
-### Environment Setup
+### Environment setup
   Create a new conda environment named `PICS` and install the dependencies: 
   ```
   conda env create --file=PICS.yml
   conda activate PICS
   ```
 
-### Weights Preparation
+### Weights preparation
 1. ***DINOv2***: Download [ViT-g/14](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) and place it at: checkpoints/dinov2_vitg14_pretrain.pth
 2. ***PICS Checkpoints***: (Links will be updated once uploaded to Google Drive/Hugging Face).
   <!-- Download the [ViT-g/14](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) version of DINOv2 for object feature extraction and put it in the directory ```PICS/checkpoints/dinov2_vitg14_pretrain.pth```.  -->
@@ -76,7 +76,7 @@ We provide the processed ***two-object compositing data*** in WebDataset format 
 | Mapillary Vistas | 603 | 581.5MB | [Download](https://drive.google.com/drive/folders/1a0756wc2bvvHJ_8a01N0tZ_Kb_BkRZv1?usp=sharing) |
 | BDD100K | 1,012 | 204MB | [Download](https://drive.google.com/drive/folders/1zS60KPfZioU4tW1ngDK1KahE7T-TeIim?usp=sharing) |
 
-## Data Organization
+### Data organization
 ```
 PICS/
 ├── data/
@@ -93,32 +93,25 @@ PICS/
 
 ## Training
 
-<!-- To train a model on Cityscapes:
+To train a model on the whole dataset:
 ```
-python -m main \
-    --epochs 200 \
-    --batch_size 2 \
-    --save_freq 10 \
-    --set_cost_class 1 \
-    --ce_loss_coef 1 \
-    --num_queries 120 \
-    --eos_coef 0.1 \
-    --lr 1e-4 \
-    --data_path data/Cityscapes \
-    --output_dir results/Cityscapes_ckpt \
-    --resume weights/detr-r50-e632da11.pth
-``` -->
+python run_train.py \
+    --resume_path '/scratch/hang18/PICS/LOGS/LVIS_two_obj3_1/checkpoints/pics-step=008000.ckpt' \
+    --root_dir 'LOGS/whole_data' \
+    --batch_size 16 \
+    --limit_train_batches 1 \
+    --logger_freq 1000 \
+    --is_joint
+```
 
 ## Inference
-<!-- ```
-python test.py \
-    --num_queries 120 \
-    --data_path data/Cityscapes \
-    --pretrained_model 'results/Cityscapes_ckpt/checkpoint.pth' \
-    --im_root 'data/Cityscapes/test' \
-    --output_dir 'results/Cityscape_inference'
 ```
- -->
+python run_test.py \
+    --input "data/Wild" \
+    --output "results/Wild" \
+    --obj_thr 2
+```
+
 
 
 
