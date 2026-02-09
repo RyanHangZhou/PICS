@@ -4,40 +4,36 @@
 ***Check out our [Project Page](https://ryanhangzhou.github.io/pics/) for more visual demos!***
 
 <!-- Updates -->
-<!-- ## ⏩ Updates -->
+## ⏩ Updates
 
-<!-- **03/20/2025**
-- Release training code and pretrained models.
+**02/08/2026**
+- Release training and inference code.
 
-**06/24/2025**
+<!-- **06/24/2025**
 - Release inference code and data. -->
 
 <!-- TODO List -->
-<!-- ## 🚧 TODO List
-- [x] Release training code
-- [x] Release pretrained models
-- [x] Release dataset
-- [x] Release inference code -->
-
-
+## 🚧 TODO List
+- [x] Release training and inference code
+- [ ] Release pretrained models
+- [ ] Release dataset
+- [ ] Release any-object compositing code
 
 <!-- Installation -->
-<!-- ## 📦 Installation
+## 📦 Installation
 
 ### Prerequisites
 - **System**: The code is currently tested only on **Linux**. 
-- **Hardware**: An NVIDIA GPU with at least 16GB of memory is necessary. The code has been verified on NVIDIA A6000 GPUs.  
+- **Hardware**: An NVIDIA GPU with at least 40GB of memory is necessary. The code has been verified on NVIDIA A6000 GPUs.  
 - **Software**:   
   - [Conda](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) is recommended for managing dependencies.  
   - Python version 3.6 or higher is required. 
 
-  Create a new conda environment named `BOOTPLACE` and install the dependencies: 
+  Create a new conda environment named `PICS` and install the dependencies: 
   ```
-  conda env create --file=BOOTPLACE.yml
+  conda env create --file=PICS.yml
   ```
-  Download DETR-R50 pretrained models for finetuning [here](https://dl.fbaipublicfiles.com/detr/detr-r50-e632da11.pth) and put it in the directory ```weights/detr-r50-e632da11.pth```. 
--->
-
+  Download the ViT-g/14 version of DINOv2 for object feature extraction [here](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) and put it in the directory ```checkpoints/dinov2_vitg14_pretrain.pth```. 
 
 Download pretrained model
 ```
