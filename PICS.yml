@@ -1,4 +1,4 @@
-name: pics2
+name: pics
 channels:
   - defaults
   - https://repo.anaconda.com/pkgs/main

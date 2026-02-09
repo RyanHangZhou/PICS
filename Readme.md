@@ -24,7 +24,7 @@
 
 ### Prerequisites
 - **System**: The code is currently tested only on **Linux**. 
-- **Hardware**: An NVIDIA GPU with at least 40GB of memory is necessary. The code has been verified on NVIDIA A6000 GPUs.  
+- **Hardware**: An NVIDIA GPU with at least 40GB of memory is necessary. The code has been verified on NVIDIA A6000 and H100 GPUs.  
 - **Software**:   
   - [Conda](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) is recommended for managing dependencies.  
   - Python version 3.6 or higher is required. 
@@ -33,14 +33,7 @@
   ```
   conda env create --file=PICS.yml
   ```
-  Download the ViT-g/14 version of DINOv2 for object feature extraction [here](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) and put it in the directory ```checkpoints/dinov2_vitg14_pretrain.pth```. 
-
-Download pretrained model
-```
-mkdir checkpoints
-
-```
-
+  Download the ViT-g/14 version of DINOv2 for object feature extraction [here](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) and put it in the directory ```PICS/checkpoints/dinov2_vitg14_pretrain.pth```. 
 
 
 <!-- Pretrained Models -->
@@ -63,7 +56,20 @@ Here is an [example](test.py) of how to use the pretrained models for object pla
 
 <!-- Dataset -->
 ## 📚 Dataset
-<!-- We use the data from Cityscapes and [OPA](https://github.com/bcmi/Object-Placement-Assessment-Dataset-OPA). Note that we have provided instructions to prepare customized Cityscapes dataset for object composition in supplementary material. -->
+Our training set is a combination of [LVIS](https://www.lvisdataset.org/), [VITON-HD](https://www.kaggle.com/datasets/marquis03/high-resolution-viton-zalando-dataset), [Objects365](https://www.objects365.org/overview.html), [Cityscapes](https://www.cityscapes-dataset.com/), [Mapillary Vistas](https://www.mapillary.com/dataset/vistas) and [BDD100K](https://bair.berkeley.edu/blog/2018/05/30/bdd/). 
+<!-- Note that we have provided instructions to prepare customized Cityscapes dataset for object composition in supplementary material. -->
+
+We provide below links for downloading the processed two-object compositing data: 
+| Model | #Sample | Download |
+| --- | --- | --- |
+| LVIS | 34,160 | [Download]() |
+| VITON-HD | 11,647 | [Download]() |
+| Objects365 | 940,764 | [Download]() |
+| Cityscapes | 536 | [Download]() |
+| Mapillary Vistas | 603 | [Download]() |
+| BDD100K | 1,012 | [Download]() |
+
+
 <!-- We provide **TRELLIS-500K**, a large-scale dataset containing 500K 3D assets curated from [Objaverse(XL)](https://objaverse.allenai.org/), [ABO](https://amazon-berkeley-objects.s3.amazonaws.com/index.html), [3D-FUTURE](https://tianchi.aliyun.com/specials/promotion/alibaba-3d-future), [HSSD](https://huggingface.co/datasets/hssd/hssd-models), and [Toys4k](https://github.com/rehg-lab/lowshot-shapebias/tree/main/toys4k), filtered based on aesthetic scores. Please refer to the [dataset README](DATASET.md) for more details. -->
 <!-- We provide a large-scale street-scene vehicle placement dataset [Download](https://drive.google.com/file/d/1wOzpMPy3Vy0tdBRD0xC1eW3SO2aVeCVX/view?usp=sharing) curated from [Cityscapes](https://www.cityscapes-dataset.com/). 
 The file structures are: 
