@@ -60,10 +60,10 @@ Our training set is a combination of [LVIS](https://www.lvisdataset.org/), [VITO
 <!-- Note that we have provided instructions to prepare customized Cityscapes dataset for object composition in supplementary material. -->
 We provide below links for downloading the processed two-object compositing data: 
 | Model | #Sample | Size | Download |
-| --- | --- | --- |
+| --- | --- | --- | --- |
 | LVIS | 34,160 | 7.98GB | [Download](https://drive.google.com/drive/folders/1Ir1cwR7K8HALNJiS6kTTlMgKIn8f18XX?usp=sharing) |
 | VITON-HD | 11,647 | 2.53GB | [Download](https://drive.google.com/drive/folders/1317fJvvc7J1OTdbiM_Rst0C9AewIcNr2?usp=sharing) |
-| Objects365 | 940,764 | | [Download]() |
+| Objects365 | 940,764 | TODO | [Download]() |
 | Cityscapes | 536 | 1.21GB | [Download](https://drive.google.com/drive/folders/1HYgEgZcknvEMbK2XZf2isY0pYcluGoKU?usp=sharing) |
 | Mapillary Vistas | 603 | 581.5MB | [Download](https://drive.google.com/drive/folders/1a0756wc2bvvHJ_8a01N0tZ_Kb_BkRZv1?usp=sharing) |
 | BDD100K | 1,012 | 204MB | [Download](https://drive.google.com/drive/folders/1zS60KPfZioU4tW1ngDK1KahE7T-TeIim?usp=sharing) |
