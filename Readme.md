@@ -114,7 +114,6 @@ To train a model on the whole dataset:
 python run_train.py \
     --root_dir 'LOGS/whole_data' \
     --batch_size 16 \
-    --limit_train_batches 1 \
     --logger_freq 1000 \
     --is_joint
 ```
