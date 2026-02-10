@@ -224,43 +224,6 @@ def process_composition(item, obj_thr):
     item.update({'hint': collage.copy()})
     return item
 
-
-# if __name__ == '__main__': 
-#     sample_num = 31
-#     compose_num = 2
-#     obj_thr = 2
-#     save_path = 'results/LVIS_again2'
-#     input_path = '/data/hang/customization/data/Wild'
-#     os.makedirs(save_path, exist_ok=True)
-#     img_list = os.listdir(input_path)
-
-#     for i in img_list:
-#         print(os.path.join(input_path, i+'/'+'image.jpg'))
-#         back_image = cv2.imread(os.path.join(input_path, i+'/'+'image.jpg')).astype(np.uint8)
-#         back_image = cv2.cvtColor(back_image, cv2.COLOR_BGR2RGB)
-
-#         counter = 0
-#         item_with_collage = {}
-#         for j in range(compose_num):
-#             patch_dir = os.path.join(input_path, i+"/object_"+str(j)+".png")
-#             bg_mask_path_i = os.path.join(input_path, i+"/object_"+str(j)+"_mask.png")
-#             tar_mask = cv2.imread(bg_mask_path_i)[:,:,0] > 128
-#             tar_mask = tar_mask.astype(np.uint8)
-
-#             item = process_pairs_multiple(tar_mask, back_image.copy(), patch_dir, counter)
-#             item_with_collage.update(item)
-#             counter += 1
-
-#         item_with_collage = process_composition(item_with_collage, obj_thr)
-#         gen_image = inference(item_with_collage, back_image)
-        
-#         comp_image_dir = os.path.join(save_path, 'composed')
-#         if not os.path.exists(comp_image_dir):
-#             os.mkdir(comp_image_dir)
-#         comp_save_path = os.path.join(comp_image_dir, 'composed'+str(i)+'__'+'.png')
-#         cv2.imwrite(comp_save_path, gen_image[:,:,::-1])
-
-
 def run_inference(input_dir, output_dir, sample_num=31, obj_thr=2):
     """
     Core inference loop for multi-object composition.
