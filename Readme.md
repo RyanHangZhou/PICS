@@ -10,14 +10,14 @@
 - Release training and inference code.
 - Release training data.
 
-<!-- **06/24/2025**
-- Release inference code and data. -->
+**03/01/2025**
+- Release checkpoints. -->
 
 <!-- TODO List -->
 ## 🚧 TODO List
 - [x] Release training and inference code
 - [x] Release datasets (LVIS, Objects365, etc. in WebDataset format)
-- [ ] Release pretrained models (coming soon)
+- [x] Release pretrained models
 - [ ] Release any-object compositing code
 
 <!-- Installation -->
@@ -26,7 +26,7 @@
 ### Prerequisites
 - **System**: Linux (Tested on Ubuntu 20.04/22.04).
 - **Hardware**: 
-  - **GPU**: NVIDIA GPU with at least **40GB VRAM** (e.g., A6000, A100, H100). 
+  - **GPU**: NVIDIA GPU with at least **40GB VRAM** (e.g., A6000, H100). 
   - **RAM**: Minimum 64GB system memory recommended.
 - **Software**:   
   - [Conda](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) is recommended.  
@@ -47,12 +47,12 @@
 
 <!-- Pretrained Models -->
 ## 🤖 Pretrained Models
-Coming soon! We are currently finalizing the model weights for public release.
-<!-- We provide the following pretrained models:
+<!-- Coming soon! We are currently finalizing the model weights for public release. -->
+We provide the following pretrained models:
 
 | Model | Description | #Params | Download |
 | --- | --- | --- | --- |
-| BOOTPLACE_Cityscapes | Multiple supervision | 523M | [Download](https://drive.google.com/file/d/1OeCourPQf1a6yM2BYNNuUKI3yvXRcD_N/view?usp=drive_link) | -->
+| PICS | Full model | 18.45GB | [Download](https://drive.google.com/file/d/17JpvhRvHFjfqQDiV9RFfgjGa0iLropXK/view?usp=sharing) |
 
 
 <!-- Usage -->
