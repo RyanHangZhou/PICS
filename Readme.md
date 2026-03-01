@@ -50,7 +50,7 @@
 <!-- Coming soon! We are currently finalizing the model weights for public release. -->
 We provide the following pretrained models:
 
-| Model | Description | #Params | Download |
+| Model | Description | size | Download |
 | --- | --- | --- | --- |
 | PICS | Full model | 18.45GB | [Download](https://drive.google.com/file/d/17JpvhRvHFjfqQDiV9RFfgjGa0iLropXK/view?usp=sharing) |
 
