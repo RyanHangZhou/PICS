@@ -11,7 +11,7 @@
 - Release training data.
 
 **03/01/2025**
-- Release checkpoints. -->
+- Release checkpoints. 
 
 <!-- TODO List -->
 ## 🚧 TODO List
