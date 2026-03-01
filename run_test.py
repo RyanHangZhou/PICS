@@ -21,27 +21,11 @@ config = OmegaConf.load('./configs/inference.yaml')
 model_ckpt =  config.pretrained_model
 model_config = config.config_file
 
-model = create_model(model_config ).cpu()
+model = create_model(model_config).cpu()
 model.load_state_dict(load_state_dict(model_ckpt, location='cuda'))
 model = model.cuda()
 ddim_sampler = DDIMSampler(model)
 
-def aug_patch(patch):
-    gray = cv2.cvtColor(patch, cv2.COLOR_RGB2GRAY)
-    mask = (gray < 250).astype(np.float32)[:, :, None] 
-
-    transform = A.Compose([
-        A.HorizontalFlip(p=0.2),
-        A.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, p=0.3),
-        A.Rotate(limit=15, border_mode=cv2.BORDER_REPLICATE, p=0.5),
-    ])
-
-    transformed = transform(image=patch.astype(np.uint8), mask=mask)
-    aug_img = transformed["image"]
-    aug_mask = transformed["mask"]
-    final_img = aug_img * aug_mask + 255 * (1 - aug_mask)
-
-    return final_img.astype(np.uint8)
 
 def get_input(batch, k):
     x = batch[k]
@@ -127,7 +111,7 @@ def inference(item, back_image):
     # Resize and crop
     side = max(back_image.shape[0], back_image.shape[1])
     pred = cv2.resize(pred, (side, side))
-    pred = crop_back(pred, back_image, item['extra_sizes'], item['hint_sizes0'], item['hint_sizes1']) 
+    pred = crop_back(pred, back_image, item['extra_sizes'], item['hint_sizes0'], item['hint_sizes1'], is_masked=True) 
     
     return pred
 
@@ -136,16 +120,12 @@ def process_pairs_multiple(mask, tar_image, patch_dir, counter=0, max_ratio=0.8)
     # 1. Process Reference Object (View)
     view = cv2.imread(patch_dir)
     view = cv2.cvtColor(view, cv2.COLOR_BGR2RGB)
-    ratio = np.random.randint(11, 15) / 10
-    view = expand_image(view, ratio=ratio)
-    view = aug_patch(view)
     view = pad_to_square(view, pad_value=255, random=False)
     view = cv2.resize(view.astype(np.uint8), (224, 224))
     view = view.astype(np.float32) / 255.0
 
     # 2. BBox and Mask Logic
     box_yyxx = get_bbox_from_mask(mask)
-    box_yyxx = expand_bbox(mask, box_yyxx, ratio=[1.1, 1.2])
     
     # Define crop area (using full image here)
     H1, W1 = tar_image.shape[0], tar_image.shape[1]
@@ -204,9 +184,10 @@ def process_pairs_multiple(mask, tar_image, patch_dir, counter=0, max_ratio=0.8)
 
     return item
 
+
 def process_composition(item, obj_thr):
-    collage = item['collage']
-    collage_mask = collage.copy() * 0.0
+    collage = item['collage'].copy()
+    collage_mask = np.zeros((collage.shape[0], collage.shape[1], 1), dtype=np.float32)
 
     for i in reversed(range(obj_thr)):
         y1, x1, y2, x2 = item['hint_sizes'+str(i)]
@@ -214,14 +195,20 @@ def process_composition(item, obj_thr):
         collage_mask[y1:y2,x1:x2,:] = 1.0
 
     collage = pad_to_square(collage, pad_value = 0, random = False).astype(np.uint8)
-    collage = cv2.resize(collage.astype(np.uint8), (512, 512)).astype(np.float32)
-    collage = collage / 127.5 - 1.0 
+    
+    collage_mask = pad_to_square(collage_mask, pad_value = 2, random = False).astype(np.float32)
 
-    collage_mask = pad_to_square(collage_mask, pad_value = 0, random = False).astype(np.uint8)
-    collage_mask  = cv2.resize(collage_mask.astype(np.uint8), (512, 512),  interpolation=cv2.INTER_NEAREST).astype(np.float32)
+    collage = cv2.resize(collage.astype(np.uint8), (512, 512)).astype(np.float32) / 127.5 - 1.0 
+    collage_mask = cv2.resize(collage_mask, (512, 512), interpolation=cv2.INTER_NEAREST).astype(np.float32)
+    
+    if len(collage_mask.shape) == 2: 
+        collage_mask = collage_mask[..., None]
+    
+    collage_mask[collage_mask == 2] = -1.0
 
-    collage = np.concatenate([collage, collage_mask[:,:,:1]] , -1)
-    item.update({'hint': collage.copy()})
+    collage_final = np.concatenate([collage, collage_mask[:,:,:1]] , -1)
+    
+    item.update({'hint': collage_final.copy()})
     return item
 
 def run_inference(input_dir, output_dir, sample_num=31, obj_thr=2):
@@ -248,6 +235,7 @@ def run_inference(input_dir, output_dir, sample_num=31, obj_thr=2):
         # 2. Iteratively process multiple objects
         item_with_collage = {}
         for j in range(obj_thr):
+        # for j in reversed(range(obj_thr)):
             patch_path = os.path.join(img_folder, f"object_{j}.png")
             mask_path = os.path.join(img_folder, f"object_{j}_mask.png")
             
@@ -271,6 +259,7 @@ def run_inference(input_dir, output_dir, sample_num=31, obj_thr=2):
         # 4. Save result
         save_name = f'composed_{img_id}.png'
         cv2.imwrite(os.path.join(comp_image_dir, save_name), gen_image[:, :, ::-1])
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
