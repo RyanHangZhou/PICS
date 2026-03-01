@@ -32,7 +32,6 @@
 | Stage | GPU (VRAM) | System RAM | Batch Size |
 | --- | --- | --- | --- |
 | Training | NVIDIA H100 (80GB) | 120GB | 16 |
-| --- | --- | --- | --- |
 | Inference | NVIDIA RTX A6000 (48GB) | 64GB | 1 |
 
 ### Environment setup
