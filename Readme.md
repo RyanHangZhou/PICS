@@ -119,6 +119,8 @@ python run_train.py \
 ```
 
 ## Inference
+
+Run two-object compositing mode: 
 ```
 python run_test.py \
     --input "sample" \
@@ -150,3 +152,9 @@ This project is licensed under the terms of the MIT license.
   year={2025}
 }
 ``` -->
+
+## 🙌 Acknowledgements
+We would like to thank the contributors to the [AnyDoor](https://huggingface.co/papers/2307.09481) repository for their open research.
+
+## Contact Us
+For any inquiries, feel free to open a GitHub issue or reach out via email.
