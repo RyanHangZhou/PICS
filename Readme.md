@@ -42,27 +42,28 @@
   ```
 
 ### Weights preparation
-1. ***DINOv2***: Download [ViT-g/14](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) and place it at: checkpoints/dinov2_vitg14_pretrain.pth
-2. ***PICS Checkpoints***: (Links will be updated once uploaded to Google Drive/Hugging Face).
-  <!-- Download the [ViT-g/14](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) version of DINOv2 for object feature extraction and put it in the directory ```PICS/checkpoints/dinov2_vitg14_pretrain.pth```.  -->
-
+***DINOv2***: Download [ViT-g/14](https://dl.fbaipublicfiles.com/dinov2/dinov2_vitg14/dinov2_vitg14_pretrain.pth) and place it at: checkpoints/dinov2_vitg14_pretrain.pth
 
 <!-- Pretrained Models -->
 ## 🤖 Pretrained Models
 <!-- Coming soon! We are currently finalizing the model weights for public release. -->
-We provide the following pretrained models:
+We provide the following pretrained models (to be placed at the same directory with DINOv2):
 
 | Model | Description | size | Download |
 | --- | --- | --- | --- |
 | PICS | Full model | 18.45GB | [Download](https://drive.google.com/file/d/17JpvhRvHFjfqQDiV9RFfgjGa0iLropXK/view?usp=sharing) |
 
 
-<!-- Usage -->
-<!-- ## 💡 Usage
+## Minimal Example for Inference
 
-### Minimal Example
-
-Here is an [example](test.py) of how to use the pretrained models for object placement. -->
+Here is an [example](run_test.py) of how to use the pretrained models for pairwise image compositing.
+Run two-object compositing mode: 
+```
+python run_test.py \
+    --input "sample" \
+    --output "results/sample" \
+    --obj_thr 2
+```
 
 
 <!-- Dataset -->
@@ -119,18 +120,6 @@ python run_train.py \
     --logger_freq 1000 \
     --is_joint
 ```
-
-## Inference
-
-Run two-object compositing mode: 
-```
-python run_test.py \
-    --input "sample" \
-    --output "results/sample" \
-    --obj_thr 2
-```
-
-
 
 
 <!-- License -->
