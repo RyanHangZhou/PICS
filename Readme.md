@@ -15,7 +15,7 @@
 
 <!-- TODO List -->
 ## 🚧 TODO List
-- [x] Release training and inference code
+- [x] Release training and inference code for pairwise image compositing
 - [x] Release datasets (LVIS, Objects365, etc. in WebDataset format)
 - [x] Release pretrained models
 - [ ] Release any-object compositing code
@@ -24,13 +24,16 @@
 ## 📦 Installation
 
 ### Prerequisites
-- **System**: Linux (Tested on Ubuntu 20.04/22.04).
-- **Hardware**: 
-  - **GPU**: NVIDIA GPU with at least **40GB VRAM** (e.g., A6000, H100). 
-  - **RAM**: Minimum 64GB system memory recommended.
-- **Software**:   
-  - [Conda](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) is recommended.  
-  - **Python 3.10** or higher.
+- **OS**: Linux (Tested on Ubuntu 20.04/22.04).
+- **Python**: 3.10 or higher.
+- **Package Manager**: [Conda](https://docs.anaconda.com/miniconda/install/#quick-command-line-install) is recommended.   
+
+**Hardware Requirements**
+| Stage | GPU (VRAM) | System RAM | Batch Size |
+| --- | --- | --- | --- |
+| Training | NVIDIA H100 (80GB) | 120GB | 16 |
+| --- | --- | --- | --- |
+| Inference | NVIDIA RTX A6000 (48GB) | 64GB | 1 |
 
 ### Environment setup
   Create a new conda environment named `PICS` and install the dependencies: 
@@ -139,7 +142,7 @@ This project is licensed under the terms of the MIT license.
 
 
 <!-- Citation -->
-## 📜 Citation
+<!-- ## 📜 Citation -->
 
 <!-- If you find this work helpful, please consider citing our paper: -->
 
