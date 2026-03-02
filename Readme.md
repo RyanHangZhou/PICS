@@ -16,7 +16,7 @@
 <h1 align="center">PICS: Pairwise Image Compositing with Spatial Interactions</h1>
 <p align="center"><img src="assets/figure.jpg" width="100%"></p>
 
-***Check out our [Project Page](https://ryanhangzhou.github.io/pics/) for more visual demos!***
+<!-- ***Check out our [Project Page](https://ryanhangzhou.github.io/pics/) for more visual demos!*** -->
 
 <!-- Updates -->
 ## ⏩ Updates
