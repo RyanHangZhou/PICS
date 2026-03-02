@@ -10,6 +10,7 @@ examples/
 rebuttal/
 scripts_comp/
 visualize/
+huggingface/
 
 # --- Python env ---
 __pycache__/
