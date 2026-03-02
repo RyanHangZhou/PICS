@@ -62,7 +62,7 @@
 <!-- Pretrained Models -->
 ## 🤖 Pretrained Models
 <!-- Coming soon! We are currently finalizing the model weights for public release. -->
-We provide the following pretrained models (to be placed at the same directory with DINOv2):
+We provide the following pretrained models (to be placed at the same directory with DINOv2 checkpoints):
 
 | Model | Description | size | Download |
 | --- | --- | --- | --- |
@@ -80,6 +80,11 @@ python run_test.py \
     --obj_thr 2
 ```
 
+### 🤗 Online Demo
+For a quick start without local environment setup, you can try our interactive demo on **Hugging Face Spaces**:
+[![HuggingFace Spaces](https://img.shields.io/badge/🤗%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/RyanHangZhou/PICS)
+
+You can simply upload your images or click on the provided examples to see the pairwise compositing results in real-time.
 
 <!-- Dataset -->
 ## 📚 Dataset
